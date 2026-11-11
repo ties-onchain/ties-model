@@ -1,7 +1,9 @@
+import io
 import json
 import tempfile
 import unittest
 from decimal import Decimal
+from contextlib import redirect_stdout
 from unittest import mock
 from pathlib import Path
 
@@ -14,6 +16,8 @@ XML = """<edgarSubmission><reportDate>2026-10-31</reportDate><seriesId>S00006704
 <dialyShareholderFlowReported><dailyGrossSubscriptions>70227252.09</dailyGrossSubscriptions>
 <dailyGrossRedemptions>144695.30</dailyGrossRedemptions><dailyShareHolderFlowDate>2026-10-01</dailyShareHolderFlowDate></dialyShareholderFlowReported>
 </edgarSubmission>"""
+
+OCT = "https://www.sec.gov/Archives/edgar/data/1786958/aoct/primary_doc.xml"
 
 SUBMISSIONS = {"filings": {"recent": {
     "form": ["N-MFP3", "N-MFP3/A", "N-MFP3", "485BPOS"],
@@ -45,10 +49,25 @@ class SecTest(unittest.TestCase):
             return json.dumps(SUBMISSIONS) if "submissions" in url else XML.replace("2026-10-31", "2026-09-30") if "asepamend" in url else XML
         with tempfile.TemporaryDirectory() as tmp, mock.patch.object(sec, "HERE", Path(tmp)), mock.patch.object(sec.time, "sleep"):
             (Path(tmp) / "official").mkdir()
-            (Path(tmp) / "official" / "BENJI.json").write_text(json.dumps([{"report_date": "2026-10-31", "daily_flows": []}]))
+            (Path(tmp) / "official" / "BENJI.json").write_text(json.dumps([{"report_date": "2026-10-31", "daily_flows": [], "source": OCT}]))
             out = sec.update("BENJI", {"cik": "0001786958", "series_id": "S000067043"}, "ua", get=get)
         self.assertEqual([e["report_date"] for e in out], ["2026-10-31", "2026-09-30"])
         self.assertEqual(len(calls), 2)  # submissions + the one missing filing
+
+    def test_an_amendment_to_a_saved_month_replaces_it_and_says_so(self):
+        def get(url, _agent):
+            return json.dumps(SUBMISSIONS) if "submissions" in url else XML.replace("2026-10-31", "2026-09-30") if "asepamend" in url else XML
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(sec, "HERE", Path(tmp)), mock.patch.object(sec.time, "sleep"):
+            (Path(tmp) / "official").mkdir()
+            saved = [{"report_date": "2026-10-31", "daily_flows": [], "source": OCT},
+                     {"report_date": "2026-09-30", "daily_flows": [], "shares_outstanding": "1", "source": "https://www.sec.gov/old-sep"}]
+            (Path(tmp) / "official" / "BENJI.json").write_text(json.dumps(saved))
+            with redirect_stdout(io.StringIO()) as out:
+                entries = sec.update("BENJI", {"cik": "0001786958", "series_id": "S000067043"}, "ua", get=get)
+        sep = next(e for e in entries if e["report_date"] == "2026-09-30")
+        self.assertIn("asepamend", sep["source"])
+        self.assertNotEqual(sep["shares_outstanding"], "1")
+        self.assertIn("sec: BENJI 2026-09-30 amended", out.getvalue())
 
 
 if __name__ == "__main__":

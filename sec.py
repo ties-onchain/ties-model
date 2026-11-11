@@ -60,14 +60,14 @@ def update(fund, official, agent, keep=6, get=sec_get):
     cik = official["cik"].lstrip("0")
     subs = json.loads(get(f"https://data.sec.gov/submissions/CIK{int(cik):010d}.json", agent))
     for day, accession, doc in filings(subs)[:keep]:
-        if day in cached:
+        url = f"https://www.sec.gov/Archives/edgar/data/{cik}/{accession.replace('-', '')}/{doc}"
+        if day in cached and cached[day].get("source") == url:
             continue
         time.sleep(0.5)  # SEC fair-access: well under 10 requests a second
-        url = f"https://www.sec.gov/Archives/edgar/data/{cik}/{accession.replace('-', '')}/{doc}"
-        entry = parse_nmfp3(get(url, agent), official["series_id"])
-        cached[day] = entry | {"source": url}
+        if day in cached:  # a later filing for a month already saved: an amendment replaces it, and says so
+            print(f"sec: {fund} {day} amended, now {url} (was {cached[day].get('source')})")
+        cached[day] = parse_nmfp3(get(url, agent), official["series_id"]) | {"source": url}
     entries = sorted(cached.values(), key=lambda e: e["report_date"], reverse=True)
-    path.parent.mkdir(exist_ok=True)
     path.parent.mkdir(exist_ok=True)
     path.write_text(json.dumps(entries, indent=1) + "\n")
     return entries
