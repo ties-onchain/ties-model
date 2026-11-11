@@ -84,6 +84,8 @@ Every mint and burn becomes one event:
 | migration | a burn on one chain and the same amount minted on another within 30 minutes, or the issuer's own label (Franklin's `InstantCXTransfer`) |
 | unknown | touches supply but fits no rule: listed, never dropped |
 
+Rules improve. An event keeps its `id` when its label changes, and every change to a published event (kind, side, amount, gone, added) is recorded with the date and the engine version in https://ties-onchain.github.io/data/changes.json.
+
 The closure check is the test of the whole model: for each chain, the supply change between two reads must equal the archived mints minus burns between the same blocks.
 
 ## Known limits
