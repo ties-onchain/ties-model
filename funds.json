@@ -1,0 +1,395 @@
+{
+  "BUIDL": {
+    "expect_name": [
+      "BlackRock"
+    ],
+    "rwa_slug": "BUIDL",
+    "address_source": "DefiLlama-Adapters projects/securitize/index.js, cross-checked on-chain (token name) and against rwa.xyz token list",
+    "tokens": [
+      {
+        "chain": "ethereum",
+        "class": "BUIDL",
+        "kind": "evm",
+        "address": "0x7712c34205737192402172409a8f7ccef8aa2aec",
+        "rpcs": [
+          "https://ethereum-rpc.publicnode.com",
+          "https://eth.drpc.org"
+        ],
+        "events": {
+          "etherscan": 1
+        }
+      },
+      {
+        "chain": "ethereum",
+        "class": "BUIDL-I",
+        "kind": "evm",
+        "address": "0x6a9DA2D710BB9B700acde7Cb81F10F1fF8C89041",
+        "rpcs": [
+          "https://ethereum-rpc.publicnode.com",
+          "https://eth.drpc.org"
+        ],
+        "events": {
+          "etherscan": 1
+        },
+        "slot": "ethereum-i"
+      },
+      {
+        "chain": "solana",
+        "class": "BUIDL",
+        "kind": "solana",
+        "address": "GyWgeqpy5GueU2YbkE8xqUeVEokCMMCEeUrfbtMw6phr",
+        "rpcs": [
+          "https://api.mainnet-beta.solana.com",
+          "https://solana-mainnet.gateway.tatum.io"
+        ],
+        "events": {
+          "rpcs": [
+            "https://api.mainnet-beta.solana.com"
+          ]
+        }
+      },
+      {
+        "chain": "avalanche",
+        "class": "BUIDL",
+        "kind": "evm",
+        "address": "0x53fc82f14f009009b440a706e31c9021e1196a2f",
+        "rpcs": [
+          "https://avalanche-c-chain-rpc.publicnode.com",
+          "https://api.avax.network/ext/bc/C/rpc"
+        ],
+        "events": {
+          "rpcs": [
+            "https://avalanche-c-chain-rpc.publicnode.com"
+          ],
+          "span": 50000,
+          "one_query": true,
+          "labels": false
+        }
+      },
+      {
+        "chain": "bsc",
+        "class": "BUIDL",
+        "kind": "evm",
+        "address": "0x2d5bdc96d9c8aabbdb38c9a27398513e7e5ef84f",
+        "rpcs": [
+          "https://bsc-rpc.publicnode.com",
+          "https://bsc-dataseed.bnbchain.org"
+        ],
+        "events": {
+          "rpcs": [
+            "https://bsc.rpc.blxrbdn.com"
+          ],
+          "span": 4999,
+          "one_query": true,
+          "labels": false
+        }
+      },
+      {
+        "chain": "aptos",
+        "class": "BUIDL",
+        "kind": "aptos",
+        "address": "0x50038be55be5b964cfa32cf128b5cf05f123959f286b4cc02b86cafd48945f89",
+        "rpcs": [
+          "https://fullnode.mainnet.aptoslabs.com/v1",
+          "https://aptos-rest.publicnode.com/v1"
+        ],
+        "events": {
+          "module": "0x4de5876d8a8e2be7af6af9f3ca94d9e4fafb24b5f4a5848078d8eb08f08e808a::ds_token"
+        }
+      },
+      {
+        "chain": "optimism",
+        "class": "BUIDL",
+        "kind": "evm",
+        "address": "0xa1cdab15bba75a80df4089cafba013e376957cf5",
+        "rpcs": [
+          "https://mainnet.optimism.io",
+          "https://optimism.drpc.org"
+        ],
+        "events": {
+          "rpcs": [
+            "https://mainnet.optimism.io"
+          ],
+          "span": 10000,
+          "one_query": true,
+          "labels": false
+        }
+      },
+      {
+        "chain": "tempo",
+        "class": "BUIDL",
+        "kind": "evm",
+        "address": "0xb5ff12bd8010baef823d1bfa2ce6bdc0109cbb24",
+        "rpcs": [
+          "https://rpc.tempo.xyz",
+          "https://tempo.drpc.org"
+        ],
+        "events": {
+          "rpcs": [
+            "https://rpc.tempo.xyz",
+            "https://tempo.drpc.org"
+          ],
+          "span": 50000,
+          "one_query": true,
+          "labels": false
+        }
+      },
+      {
+        "chain": "arbitrum",
+        "class": "BUIDL",
+        "kind": "evm",
+        "address": "0xa6525ae43edcd03dc08e775774dcabd3bb925872",
+        "rpcs": [
+          "https://arb1.arbitrum.io/rpc",
+          "https://arb-pokt.nodies.app"
+        ],
+        "events": {
+          "etherscan": 42161
+        }
+      },
+      {
+        "chain": "polygon",
+        "class": "BUIDL",
+        "kind": "evm",
+        "address": "0x2893ef551b6dd69f661ac00f11d93e5dc5dc0e99",
+        "rpcs": [
+          "https://polygon-bor-rpc.publicnode.com",
+          "https://polygon.drpc.org"
+        ],
+        "events": {
+          "etherscan": 137
+        }
+      }
+    ],
+    "label": "BlackRock BUIDL",
+    "full_name": "BlackRock USD Institutional Digital Liquidity Fund",
+    "note": "Tokenized by Securitize"
+  },
+  "BENJI": {
+    "label": "Franklin BENJI",
+    "expect_name": [
+      "Franklin",
+      "Frk OnChain",
+      "BENJI"
+    ],
+    "rwa_slug": "BENJI",
+    "address_source": "rwa.xyz token list and DefiLlama franklinTempleton adapter, cross-checked on-chain (token name); Stellar issuer home_domain is www.franklintempleton.com. DefiLlama's Aptos address 0x7b5e... holds 0, the live one is 0x1005...",
+    "tokens": [
+      {
+        "chain": "stellar",
+        "class": "BENJI",
+        "kind": "stellar",
+        "address": "BENJI-GBHNGLLIE3KWGKCHIKMHJ5HVZHYIK7WTBE4QF5PLAKL4CJGSEU7HZIW5",
+        "rpcs": [
+          "https://horizon.stellar.org",
+          "https://horizon.stellar.lobstr.co"
+        ]
+      },
+      {
+        "chain": "base",
+        "class": "BENJI",
+        "kind": "evm",
+        "address": "0x60cfc2b186a4cf647486e42c42b11cc6d571d1e4",
+        "rpcs": [
+          "https://mainnet.base.org",
+          "https://base.drpc.org"
+        ],
+        "events": {
+          "rpcs": [
+            "https://base-rpc.publicnode.com"
+          ],
+          "span": 50000
+        }
+      },
+      {
+        "chain": "arbitrum",
+        "class": "BENJI",
+        "kind": "evm",
+        "address": "0xb9e4765bce2609bc1949592059b17ea72fee6c6a",
+        "rpcs": [
+          "https://arb1.arbitrum.io/rpc",
+          "https://arb-pokt.nodies.app"
+        ],
+        "events": {
+          "rpcs": [
+            "https://arb1.arbitrum.io/rpc"
+          ],
+          "span": 500000
+        }
+      },
+      {
+        "chain": "ethereum",
+        "class": "BENJI",
+        "kind": "evm",
+        "address": "0x3ddc84940ab509c11b20b76b466933f40b750dc9",
+        "rpcs": [
+          "https://ethereum-rpc.publicnode.com",
+          "https://eth.drpc.org"
+        ],
+        "events": {
+          "rpcs": [
+            "https://rpc.mevblocker.io",
+            "https://eth.blockscout.com/api/eth-rpc",
+            "https://rpc.flashbots.net"
+          ],
+          "span": 10000
+        }
+      },
+      {
+        "chain": "avalanche",
+        "class": "BENJI",
+        "kind": "evm",
+        "address": "0xe08b4c1005603427420e64252a8b120cace4d122",
+        "rpcs": [
+          "https://avalanche-c-chain-rpc.publicnode.com",
+          "https://api.avax.network/ext/bc/C/rpc"
+        ],
+        "events": {
+          "rpcs": [
+            "https://avalanche-c-chain-rpc.publicnode.com"
+          ],
+          "span": 50000
+        }
+      },
+      {
+        "chain": "polygon",
+        "class": "BENJI",
+        "kind": "evm",
+        "address": "0x408a634b8a8f0de729b48574a3a7ec3fe820b00a",
+        "rpcs": [
+          "https://polygon-bor-rpc.publicnode.com",
+          "https://polygon.drpc.org"
+        ],
+        "events": {
+          "etherscan": 137
+        }
+      },
+      {
+        "chain": "aptos",
+        "class": "BENJI",
+        "kind": "aptos",
+        "address": "0x100589a94461253007bb31ab4511953f37aa8967e2b22077f740e492f3a1900f",
+        "rpcs": [
+          "https://fullnode.mainnet.aptoslabs.com/v1",
+          "https://aptos-rest.publicnode.com/v1"
+        ],
+        "events": {
+          "module": "0xc37673a119c17efedec08c0f10a3c3e9e43025d124fbcc5ced599400242504dd::fund_token"
+        }
+      },
+      {
+        "chain": "solana",
+        "class": "BENJI",
+        "kind": "solana",
+        "address": "5Tu84fKBpe9vfXeotjvfvWdWbAjy3hqsExvuHgFqFxA1",
+        "rpcs": [
+          "https://api.mainnet-beta.solana.com",
+          "https://solana-mainnet.gateway.tatum.io"
+        ],
+        "events": {
+          "rpcs": [
+            "https://api.mainnet-beta.solana.com"
+          ]
+        }
+      }
+    ],
+    "full_name": "Franklin OnChain U.S. Government Money Fund",
+    "note": "Issued by Franklin Templeton",
+    "official": {
+      "kind": "sec-nmfp3",
+      "cik": "0001786958",
+      "series_id": "S000067043",
+      "ticker": "FOBXX",
+      "name": "SEC Form N-MFP3 (Franklin Templeton Trust)"
+    }
+  },
+  "EUTBL": {
+    "label": "Spiko EUTBL",
+    "full_name": "Spiko EU T-Bills Money Market Fund",
+    "note": "Issued by Spiko, a French SICAV (EU UCITS). Its prospectus names these 7 contracts as the fund's shareholder register",
+    "expect_name": [
+      "Spiko"
+    ],
+    "rwa_slug": "EUTBL",
+    "address_source": "Spiko SICAV prospectus (May 2026), section 3.2.2: the 7 public addresses of the share register, all 7 matched on 2026-11-10; first found on DefiLlama RWA, cross-checked on-chain (token name, 2 providers where free ones exist)",
+    "tokens": [
+      {
+        "chain": "ethereum",
+        "class": "EUTBL",
+        "kind": "evm",
+        "address": "0xa0769f7a8fc65e47de93797b4e21c073c117fc80",
+        "rpcs": [
+          "https://ethereum-rpc.publicnode.com",
+          "https://eth.drpc.org"
+        ]
+      },
+      {
+        "chain": "arbitrum",
+        "class": "EUTBL",
+        "kind": "evm",
+        "address": "0xcbeb19549054cc0a6257a77736fc78c367216ce7",
+        "rpcs": [
+          "https://arb1.arbitrum.io/rpc",
+          "https://arb-pokt.nodies.app"
+        ]
+      },
+      {
+        "chain": "base",
+        "class": "EUTBL",
+        "kind": "evm",
+        "address": "0xa0769f7a8fc65e47de93797b4e21c073c117fc80",
+        "rpcs": [
+          "https://mainnet.base.org",
+          "https://base.drpc.org"
+        ]
+      },
+      {
+        "chain": "polygon",
+        "class": "EUTBL",
+        "kind": "evm",
+        "address": "0xa0769f7a8fc65e47de93797b4e21c073c117fc80",
+        "rpcs": [
+          "https://polygon-bor-rpc.publicnode.com",
+          "https://polygon.drpc.org"
+        ]
+      },
+      {
+        "chain": "etherlink",
+        "class": "EUTBL",
+        "kind": "evm",
+        "address": "0xa0769f7a8fc65e47de93797b4e21c073c117fc80",
+        "rpcs": [
+          "https://node.mainnet.etherlink.com",
+          "https://rpc.ankr.com/etherlink_mainnet"
+        ]
+      },
+      {
+        "chain": "starknet",
+        "class": "EUTBL",
+        "kind": "starknet",
+        "address": "0x04f5e0de717daa6aa8de63b1bf2e8d7823ec5b21a88461b1519d9dbc956fb7f2",
+        "rpcs": [
+          "https://starknet-rpc.publicnode.com",
+          "https://api.zan.top/public/starknet-mainnet",
+          "https://starknet.api.onfinality.io/public"
+        ]
+      },
+      {
+        "chain": "stellar",
+        "class": "EUTBL",
+        "kind": "soroban",
+        "address": "CBGV2QFQBBGEQRUKUMCPO3SZOHDDYO6SCP5CH6TW7EALKVHCXTMWDDOF",
+        "rpcs": [
+          "https://soroban-rpc.mainnet.stellar.gateway.fm",
+          "https://rpc.lightsail.network"
+        ],
+        "events": {
+          "rpcs": [
+            "https://soroban-rpc.mainnet.stellar.gateway.fm",
+            "https://rpc.lightsail.network"
+          ]
+        }
+      }
+    ]
+  }
+}

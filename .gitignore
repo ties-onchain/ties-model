@@ -1,0 +1,7 @@
+__pycache__/
+.env
+snapshots/
+archive/
+cache/
+official/
+flows/

@@ -1,0 +1,4 @@
+line-length = 140
+
+[lint]
+ignore = ["E731"]  # short local lambdas are the house style (check.py, sec.py)
