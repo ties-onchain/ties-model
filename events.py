@@ -310,8 +310,13 @@ def fetch_soroban(contract, urls, start, end, rpc=jsonrpc, sleep=time.sleep):
         params = {"filters": params["filters"], "pagination": {"cursor": page["cursor"], "limit": 1000}}
 
 
-def read_events(token, start, end):
+def read_events(token, start, end, now=None):
+    """A source may name a faster provider for recent days ("recent": {"days": N, ...}) whose history is short: the
+    BNB Chain node that answers in 0.3 s keeps only 2 to 5 days, the one that keeps a week takes 28 s a query."""
     source = token["events"]
+    recent = source.get("recent")
+    if recent and stamp(start) >= (now or time.time()) - recent["days"] * 86400:
+        source = {k: v for k, v in source.items() if k != "recent"} | {k: v for k, v in recent.items() if k != "days"}
     if token["kind"] == "soroban":
         return fetch_soroban(token["address"], source["rpcs"], start, end)
     if token["kind"] == "solana":

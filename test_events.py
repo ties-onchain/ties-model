@@ -275,6 +275,17 @@ class EvmTest(unittest.TestCase):
         self.assertEqual([(m["side"], m["tx"]) for m in moves], [("mint", "0xm"), ("burn", "0xb")])
         self.assertEqual(asked, [[events.TRANSFER]])
 
+    def test_recent_days_use_the_fast_short_history_source_older_days_the_deep_one(self):
+        token = {"chain": "bsc", "kind": "evm", "address": "0xa", "events": {"rpcs": ["deep"], "span": 4999,
+                                                                              "recent": {"days": 2, "rpcs": ["fast"], "span": 50000}}}
+        used = []
+        with mock.patch.object(events, "fetch_evm", lambda chain, address, source, start, end: used.append((source["rpcs"], source["span"], "recent" in source))):
+            now = events.stamp("2026-11-12T07:00:00Z")
+            events.read_events(token, "2026-11-11T00:00:00Z", "2026-11-12T00:00:00Z", now=now)
+            events.read_events(token, "2026-11-05T00:00:00Z", "2026-11-06T00:00:00Z", now=now)
+        self.assertEqual(used, [(["fast"], 50000, False), (["deep"], 4999, True)])
+
+
 class EtherscanTest(unittest.TestCase):
     HOLDER = "0x" + "0" * 24 + "c" * 40
 

@@ -81,7 +81,14 @@
           ],
           "span": 4999,
           "one_query": true,
-          "labels": false
+          "labels": false,
+          "recent": {
+            "days": 2,
+            "rpcs": [
+              "https://bsc-rpc.publicnode.com"
+            ],
+            "span": 50000
+          }
         }
       },
       {
