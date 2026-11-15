@@ -320,6 +320,27 @@ class EtherscanTest(unittest.TestCase):
         self.assertEqual([q["page"] for q in asked if "topic1" in q], ["1", "2"])
         self.assertEqual({q["toBlock"] for q in asked if q["module"] == "logs"}, {"4999"})  # end block is exclusive
 
+    def test_a_time_etherscan_has_not_indexed_refuses_instead_of_reading_empty(self):
+        get = lambda _url: {"status": "1", "message": "NOTOK", "result": "Error! No closest block found"}
+        with self.assertRaisesRegex(RuntimeError, "not indexed"):
+            events.fetch_etherscan("polygon", "0xaa", 137, "2026-10-01T00:00:00Z", "2026-11-01T00:00:00Z", "k", get,
+                                   sleep=lambda _s: None)
+
+    def test_recent_days_read_from_public_nodes_older_ones_from_etherscan(self):
+        token = {"chain": "polygon", "kind": "evm", "address": "0xaa",
+                 "events": {"etherscan": 137, "recent": {"days": 8, "etherscan": None, "rpcs": ["u"], "span": 5000}}}
+        now = events.stamp("2026-11-15T07:00:00Z")
+        with mock.patch.object(events, "fetch_evm", return_value="rpc") as evm, \
+                mock.patch.object(events, "fetch_etherscan", return_value="etherscan"), mock.patch.dict(os.environ, {"ETHERSCAN_API_KEY": "k"}):
+            self.assertEqual(events.read_events(token, "2026-11-14T00:00:00Z", "2026-11-15T00:00:00Z", now=now), "rpc")
+            self.assertEqual(evm.call_args.args[2]["rpcs"], ["u"])
+            self.assertEqual(events.read_events(token, "2026-10-01T00:00:00Z", "2026-10-02T00:00:00Z", now=now), "etherscan")
+
+    def test_notok_flagged_as_success_still_raises(self):
+        get, _ = self.api(burn_reply={"status": "1", "message": "NOTOK", "result": "Error! something else"})
+        with self.assertRaises(RuntimeError):
+            self.fetch(get)
+
     def test_a_refused_key_raises_instead_of_reading_as_no_moves(self):
         get, _ = self.api(burn_reply={"status": "0", "message": "NOTOK", "result": "Invalid API Key"})
         with self.assertRaises(RuntimeError):

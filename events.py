@@ -160,11 +160,22 @@ def fetch_etherscan(chain, address, chainid, start, end, key, get=http_json, sle
     def call(**params):
         def once():
             out = get(f"{ETHERSCAN}?{urlencode(params | {'chainid': chainid, 'apikey': key})}")
-            if "status" in out and out["status"] != "1" and out.get("message") != "No records found":
+            if "No closest block" in str(out.get("result")):
+                return None
+            # Etherscan can answer status "1" with message "NOTOK" and an error as the result
+            if out.get("message") != "No records found" and ("status" in out and out["status"] != "1" or out.get("message") == "NOTOK"):
                 raise RuntimeError(f"etherscan: {out.get('message')}: {out.get('result')}")
             return out["result"]
         return retry(once, sleep, waits=(0.4, 5, 30, 90))
-    block = lambda iso: int(call(module="block", action="getblocknobytime", timestamp=int(stamp(iso)), closest="after"))
+
+    def block(iso):
+        """Etherscan has no block for a time it has not indexed yet. Its logs for that range then come back empty, which
+        reads as a quiet day (Polygon, 13 to 15 Nov 2026), so refuse instead of guessing the block elsewhere."""
+        found = call(module="block", action="getblocknobytime", timestamp=int(stamp(iso)), closest="after")
+        if found is None:
+            raise RuntimeError(f"{chain}: Etherscan has not indexed {iso} yet")
+        return int(found)
+
     first, stop = block(start), block(end)
     decimals = int(call(module="proxy", action="eth_call", to=address, data=DECIMALS, tag="latest"), 16)
     moves = []
@@ -323,7 +334,7 @@ def read_events(token, start, end, now=None):
         return fetch_solana(token["address"], source["rpcs"], start, end)
     if token["kind"] == "aptos":
         return fetch_aptos(token["address"], source["module"], token["rpcs"][0], start, end, required_env("APTOS_API_KEY"))
-    if "etherscan" not in source:
+    if not source.get("etherscan"):  # a "recent" override sets it to null to read recent days from public nodes
         return fetch_evm(token["chain"], token["address"], source, start, end)
     return fetch_etherscan(token["chain"], token["address"], source["etherscan"], start, end, required_env("ETHERSCAN_API_KEY"))
 

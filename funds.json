@@ -164,7 +164,15 @@
           "https://polygon.drpc.org"
         ],
         "events": {
-          "etherscan": 137
+          "etherscan": 137,
+          "recent": {
+            "days": 8,
+            "etherscan": null,
+            "rpcs": [
+              "https://polygon-bor-rpc.publicnode.com"
+            ],
+            "span": 5000
+          }
         }
       }
     ],
@@ -268,7 +276,15 @@
           "https://polygon.drpc.org"
         ],
         "events": {
-          "etherscan": 137
+          "etherscan": 137,
+          "recent": {
+            "days": 8,
+            "etherscan": null,
+            "rpcs": [
+              "https://polygon-bor-rpc.publicnode.com"
+            ],
+            "span": 5000
+          }
         }
       },
       {
