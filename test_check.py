@@ -61,6 +61,46 @@ class CheckTokenTest(unittest.TestCase):
         self.assertEqual(row["status"], "ok")
 
 
+class TokenNameOverrideTest(unittest.TestCase):
+    def test_token_level_names_replace_the_funds(self):
+        token = {**TOKEN, "expect_name": [""]}  # a legacy SPL mint carries no on-chain name
+        row = check.check_token(token, ["Ondo"], readers({"a.io": ok("7", ""), "b.io": ok("7", "")}), sleep=lambda _s: None)
+        self.assertEqual(row["status"], "ok")
+
+    def test_fund_names_still_apply_without_override(self):
+        row = check.check_token(TOKEN, ["Ondo"], readers({"a.io": ok("7", ""), "b.io": ok("7", "")}), sleep=lambda _s: None)
+        self.assertEqual(row["status"], "name mismatch")
+
+
+class NewReadersTest(unittest.TestCase):
+    def test_aptos_coin_scales_by_decimals_and_pins_one_version(self):
+        urls = []
+
+        def fake(url, payload=None):
+            urls.append(url)
+            if payload is None:
+                return {"ledger_version": "42"}
+            return {"supply": [{"vec": ["1683253542"]}], "decimals": [6], "name": ["Ondo US Dollar Yield"]}[payload["function"].split("::")[-1]]
+        with mock.patch.object(check, "http_json", side_effect=fake):
+            r = check.read_aptos_coin("https://x/v1", "0xcf::usdy::USDY")
+        self.assertEqual((r["supply"], r["name"]), (Decimal("1683.253542"), "Ondo US Dollar Yield"))
+        self.assertTrue(all("ledger_version=42" in u for u in urls[1:]))
+
+    def test_sui_reads_supply_and_checkpoint_from_one_query(self):
+        resp = {"data": {"checkpoint": {"sequenceNumber": 7}, "coinMetadata": {"decimals": 6, "name": "Ondo US Dollar Yield", "supply": "12122664157396"}}}
+        with mock.patch.object(check, "http_json", return_value=resp) as m:
+            r = check.read_sui("https://g/graphql", "0x96::usdy::USDY")
+        self.assertEqual((r["supply"], r["at"]), (Decimal("12122664.157396"), "checkpoint 7"))
+        self.assertEqual(m.call_count, 1)
+
+    def test_cosmos_uses_the_largest_exponent(self):
+        meta = {"metadata": {"name": "Ondo US Dollar Yield", "denom_units": [{"denom": "ausdy", "exponent": 0}, {"denom": "usdy", "exponent": 18}]}}
+        supply = {"amount": {"denom": "ausdy", "amount": "62531369928814821270000"}}
+        with mock.patch.object(check, "http_json", side_effect=[meta, supply]):
+            r = check.read_cosmos("https://n", "ausdy")
+        self.assertEqual(r["supply"], Decimal("62531.36992881482127"))
+
+
 class StellarTest(unittest.TestCase):
     def test_supply_counts_every_auth_state_and_parked_amounts(self):
         asset = {"balances": {"authorized": "100.0000001", "authorized_to_maintain_liabilities": "1", "unauthorized": "25.0697887"},

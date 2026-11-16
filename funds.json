@@ -414,5 +414,142 @@
         }
       }
     ]
+  },
+  "USDY": {
+    "label": "Ondo USDY",
+    "full_name": "Ondo US Dollar Yield",
+    "note": "Issued by Ondo, a tokenized note backed by short-term US Treasuries and bank deposits. No daily public filing like a US money fund, so ties reads supply on every chain but has no official record to reconcile it against",
+    "expect_name": [
+      "Ondo",
+      "ondo.finance"
+    ],
+    "rwa_slug": "USDY",
+    "address_source": "Ondo's published contract list (docs.ondo.finance/addresses, read 2026-11-16), cross-checked on-chain (token name, 2 providers where free ones exist). Bridges are LayerZero burn-and-mint: every OFT adapter held 0 USDY on 2026-11-16, so chains add up without double counting. rUSDY and Mantle mUSD wrap USDY and are not counted. Solana mint carries no on-chain name (legacy SPL), so its name check is off; address from Ondo's list",
+    "tokens": [
+      {
+        "chain": "ethereum",
+        "class": "USDY",
+        "kind": "evm",
+        "address": "0x96F6eF951840721AdBF46Ac996b59E0235CB985C",
+        "rpcs": [
+          "https://ethereum-rpc.publicnode.com",
+          "https://eth.drpc.org"
+        ]
+      },
+      {
+        "chain": "stellar",
+        "class": "USDY",
+        "kind": "stellar",
+        "address": "USDY-GAJMPX5NBOG6TQFPQGRABJEEB2YE7RFRLUKJDZAZGAD5GFX4J7TADAZ6",
+        "rpcs": [
+          "https://horizon.stellar.org",
+          "https://horizon.stellar.lobstr.co"
+        ],
+        "rwa_address": "usdy-gajmpx5nbog6tqfpqgrabjeeb2ye7rfrlukjdzazgad5gfx4j7tadaz6-1"
+      },
+      {
+        "chain": "bsc",
+        "class": "USDY",
+        "kind": "evm",
+        "address": "0x608593d17A2decBbc4399e4185bE4922F97eD32E",
+        "rpcs": [
+          "https://bsc-rpc.publicnode.com",
+          "https://bsc-dataseed.bnbchain.org"
+        ]
+      },
+      {
+        "chain": "sei",
+        "class": "USDY",
+        "kind": "evm",
+        "address": "0x54cD901491AeF397084453F4372B93c33260e2A6",
+        "rpcs": [
+          "https://evm-rpc.sei-apis.com",
+          "https://sei-evm-rpc.publicnode.com"
+        ]
+      },
+      {
+        "chain": "sui",
+        "class": "USDY",
+        "kind": "sui",
+        "address": "0x960b531667636f39e85867775f52f6b1f220a058c4de786905bdf761e06a56bb::usdy::USDY",
+        "rpcs": [
+          "https://graphql.mainnet.sui.io/graphql"
+        ]
+      },
+      {
+        "chain": "solana",
+        "class": "USDY",
+        "kind": "solana",
+        "address": "A1KLoBrKBde8Ty9qtNQUtq3C2ortoC3u7twggz7sEto6",
+        "rpcs": [
+          "https://api.mainnet-beta.solana.com",
+          "https://solana-mainnet.gateway.tatum.io"
+        ],
+        "expect_name": [
+          ""
+        ]
+      },
+      {
+        "chain": "arbitrum",
+        "class": "USDY",
+        "kind": "evm",
+        "address": "0x35e050d3C0eC2d29D269a8EcEa763a183bDF9A9D",
+        "rpcs": [
+          "https://arb1.arbitrum.io/rpc",
+          "https://arbitrum-one.public.blastapi.io"
+        ]
+      },
+      {
+        "chain": "tempo",
+        "class": "USDY",
+        "kind": "evm",
+        "address": "0x20c000000000000000000000D479B9f6eC0ceFf9",
+        "rpcs": [
+          "https://rpc.tempo.xyz",
+          "https://rpc.mainnet.tempo.xyz"
+        ]
+      },
+      {
+        "chain": "mantle",
+        "class": "USDY",
+        "kind": "evm",
+        "address": "0x5bE26527e817998A7206475496fDE1E68957c5A6",
+        "rpcs": [
+          "https://rpc.mantle.xyz",
+          "https://mantle.drpc.org"
+        ]
+      },
+      {
+        "chain": "noble",
+        "class": "USDY",
+        "kind": "cosmos",
+        "address": "ausdy",
+        "rpcs": [
+          "https://rest.cosmos.directory/noble",
+          "https://api.noble.xyz"
+        ]
+      },
+      {
+        "chain": "aptos",
+        "class": "USDY",
+        "kind": "aptos-coin",
+        "address": "0xcfea864b32833f157f042618bd845145256b1bf4c0da34a7013b76e42daa53cc::usdy::USDY",
+        "rpcs": [
+          "https://fullnode.mainnet.aptoslabs.com/v1",
+          "https://aptos-rest.publicnode.com/v1"
+        ],
+        "rwa_address": "0xf0876baf6f8c37723f0e9d9c1bbad1ccb49324c228bcc906e2f1f5a9e139eda1"
+      },
+      {
+        "chain": "plume",
+        "class": "USDY",
+        "kind": "evm",
+        "address": "0xD2B65e851Be3d80D3c2ce795eB2E78f16cB088b2",
+        "rpcs": [
+          "https://rpc.plume.org",
+          "https://plume.drpc.org"
+        ]
+      }
+    ]
   }
 }

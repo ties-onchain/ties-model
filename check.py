@@ -67,6 +67,33 @@ def read_aptos(base, metadata):
     return {"name": meta["name"], "supply": supply, "at": f"ledger version {version}"}
 
 
+def read_aptos_coin(base, coin_type):
+    """Legacy Aptos coin (module::struct type, e.g. Ondo's USDY): supply, name and decimals from the framework's view functions."""
+    version = http_json(base)["ledger_version"]
+    view = lambda fn: http_json(f"{base}/view?ledger_version={version}",
+                                {"function": f"0x1::coin::{fn}", "type_arguments": [coin_type], "arguments": []})[0]
+    supply = Decimal(int(view("supply")["vec"][0])).scaleb(-int(view("decimals")))
+    return {"name": view("name"), "supply": supply, "at": f"ledger version {version}"}
+
+
+def read_sui(url, coin_type):
+    """Sui coin supply over GraphQL (public JSON-RPC is retired); checkpoint and metadata come from one query, one snapshot."""
+    query = '{ checkpoint { sequenceNumber } coinMetadata(coinType: "%s") { decimals name supply } }' % coin_type
+    data = http_json(url, {"query": query})["data"]
+    meta = data["coinMetadata"]
+    return {"name": meta["name"], "supply": Decimal(int(meta["supply"])).scaleb(-meta["decimals"]),
+            "at": f"checkpoint {data['checkpoint']['sequenceNumber']}"}
+
+
+def read_cosmos(base, denom):
+    """Cosmos SDK bank module (Noble): denom supply, scaled by the largest exponent in the denom's metadata."""
+    meta = http_json(f"{base}/cosmos/bank/v1beta1/denoms_metadata/{denom}")["metadata"]
+    amount = http_json(f"{base}/cosmos/bank/v1beta1/supply/by_denom?denom={denom}")["amount"]["amount"]
+    exponent = max(unit["exponent"] for unit in meta["denom_units"])
+    # ponytail: unpinned latest height; two providers within a cent is the guard, pin via x-cosmos-block-height if they drift
+    return {"name": meta["name"], "supply": Decimal(int(amount)).scaleb(-exponent), "at": "latest block"}
+
+
 def stellar_supply(asset):
     """Every place a Stellar asset can sit: trustlines (any auth state), claimable balances, pools, contracts."""
     held = sum(Decimal(v) for v in asset["balances"].values())
@@ -106,7 +133,8 @@ def read_starknet(url, address):
 
 
 READERS = {"evm": read_evm, "solana": read_solana, "aptos": read_aptos, "stellar": read_stellar, "starknet": read_starknet,
-           "soroban": lambda url, address: soroban.read_soroban(url, address, jsonrpc)}
+           "soroban": lambda url, address: soroban.read_soroban(url, address, jsonrpc),
+           "aptos-coin": read_aptos_coin, "sui": read_sui, "cosmos": read_cosmos}
 
 
 RETRY_WAITS = (3, 10)  # seconds; public RPCs rate-limit (429) and blip, a nightly job should outlast that
@@ -129,9 +157,12 @@ def check_token(token, expect_names, readers=READERS, sleep=time.sleep):
         except Exception as exc:
             errors.append(f"{url.split('/')[2]}: {exc}")
     row = {**{k: token[k] for k in ("chain", "class", "address")}, "reads": reads, "errors": errors}
+    if "rwa_address" in token:  # how rwa.xyz names the same token, when it differs (comparison only)
+        row["rwa_address"] = token["rwa_address"]
     if not reads:
         return {**row, "status": "unreadable", "supply": None}
-    if not all(any(n in r["name"] for n in expect_names) for r in reads):
+    names = token.get("expect_name", expect_names)  # per token, for mints with no on-chain name (legacy SPL)
+    if not all(any(n in r["name"] for n in names) for r in reads):
         return {**row, "status": "name mismatch", "supply": None}
     supplies = {r["supply"] for r in reads}
     if max(supplies) - min(supplies) > TOLERANCE:
