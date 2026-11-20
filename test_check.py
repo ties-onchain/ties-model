@@ -131,3 +131,35 @@ class ReportTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class XrplNearTest(unittest.TestCase):
+    def test_xrpl_reads_issuer_obligations_at_one_ledger(self):
+        calls = []
+
+        def rpc(_url, method, params):
+            calls.append((method, params[0]["ledger_index"]))
+            if method == "gateway_balances":
+                return {"ledger_index": 7, "obligations": {"4F55534700000000000000000000000000000000": "1584220.17"}}
+            return {"account_data": {"Domain": "6F6E646F2E66696E616E6365"}}
+        with mock.patch.object(check, "jsonrpc", rpc):
+            out = check.read_xrpl("https://x.io", "OUSG-rIssuer")
+        self.assertEqual((out["name"], out["supply"]), ("OUSG (ondo.finance)", Decimal("1584220.17")))
+        self.assertEqual(calls, [("gateway_balances", "validated"), ("account_info", 7)])
+
+    def test_xrpl_three_letter_code_and_nothing_issued(self):
+        self.assertEqual(check.xrpl_currency("USD"), "USD")
+        with mock.patch.object(check, "jsonrpc", lambda _u, m, _p: {"ledger_index": 1} if m == "gateway_balances" else {"account_data": {}}):
+            self.assertEqual(check.read_xrpl("https://x.io", "USD-rIssuer")["supply"], Decimal(0))
+
+    def test_near_scales_by_decimals_and_pins_the_block(self):
+        refs = []
+
+        def rpc(_url, _method, params):
+            refs.append(params.get("block_id", params.get("finality")))
+            if params["method_name"] == "ft_total_supply":
+                return {"result": list(b'"123456789"'), "block_height": 42}
+            return {"result": list(b'{"name": "US Yield Coin", "decimals": 6}')}
+        with mock.patch.object(check, "jsonrpc", rpc):
+            out = check.read_near("https://n.io", "usyc.near")
+        self.assertEqual((out["supply"], refs), (Decimal("123.456789"), ["final", 42]))

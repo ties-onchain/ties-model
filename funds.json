@@ -72,8 +72,8 @@
         "kind": "evm",
         "address": "0x2d5bdc96d9c8aabbdb38c9a27398513e7e5ef84f",
         "rpcs": [
-          "https://bsc-rpc.publicnode.com",
-          "https://bsc-dataseed.bnbchain.org"
+          "https://bsc-dataseed.bnbchain.org",
+          "https://bsc-dataseed1.defibit.io"
         ],
         "events": {
           "rpcs": [
@@ -178,7 +178,8 @@
     ],
     "label": "BlackRock BUIDL",
     "full_name": "BlackRock USD Institutional Digital Liquidity Fund",
-    "note": "Tokenized by Securitize"
+    "note": "Tokenized by Securitize",
+    "coingecko": "blackrock-usd-institutional-digital-liquidity-fund"
   },
   "BENJI": {
     "label": "Franklin BENJI",
@@ -324,6 +325,10 @@
       "series_id": "S000067043",
       "ticker": "FOBXX",
       "name": "SEC Form N-MFP3 (Franklin Templeton Trust)"
+    },
+    "coingecko": "franklin-templeton-benji",
+    "coingecko_ignore": {
+      "0x4705f33d665762a5371d3b8786e63749814e749295ea73269b379c84b756d83a": "Franklin fund_token management object (FundManagement, ManagedShareHolders resources), not the supply-carrying fungible asset; ties reads 0x1005... (checked 2026-11-20)"
     }
   },
   "EUTBL": {
@@ -393,8 +398,7 @@
         "address": "0x04f5e0de717daa6aa8de63b1bf2e8d7823ec5b21a88461b1519d9dbc956fb7f2",
         "rpcs": [
           "https://starknet-rpc.publicnode.com",
-          "https://api.zan.top/public/starknet-mainnet",
-          "https://starknet.api.onfinality.io/public"
+          "https://api.zan.top/public/starknet-mainnet"
         ]
       },
       {
@@ -413,7 +417,8 @@
           ]
         }
       }
-    ]
+    ],
+    "coingecko": "eutbl"
   },
   "USDY": {
     "label": "Ondo USDY",
@@ -453,8 +458,8 @@
         "kind": "evm",
         "address": "0x608593d17A2decBbc4399e4185bE4922F97eD32E",
         "rpcs": [
-          "https://bsc-rpc.publicnode.com",
-          "https://bsc-dataseed.bnbchain.org"
+          "https://bsc-dataseed.bnbchain.org",
+          "https://bsc-dataseed1.defibit.io"
         ]
       },
       {
@@ -474,7 +479,8 @@
         "address": "0x960b531667636f39e85867775f52f6b1f220a058c4de786905bdf761e06a56bb::usdy::USDY",
         "rpcs": [
           "https://graphql.mainnet.sui.io/graphql"
-        ]
+        ],
+        "single_ok": "Sui retired public JSON-RPC; graphql.mainnet.sui.io is the only free endpoint (checked 2026-11-20: Mysten mirror and BlockVision refuse)"
       },
       {
         "chain": "solana",
@@ -506,7 +512,7 @@
         "address": "0x20c000000000000000000000D479B9f6eC0ceFf9",
         "rpcs": [
           "https://rpc.tempo.xyz",
-          "https://rpc.mainnet.tempo.xyz"
+          "https://tempo.drpc.org"
         ]
       },
       {
@@ -550,6 +556,238 @@
           "https://plume.drpc.org"
         ]
       }
-    ]
+    ],
+    "coingecko": "ondo-us-dollar-yield",
+    "coingecko_ignore": {
+      "ibc/6749D16BC09F419C090C330FC751FFF1C96143DB7A4D2FCAEC2F348A3E17618A": "IBC voucher of Noble USDY on Mantra: ICS-20 escrows the original on Noble, already in Noble's supply (checked 2026-11-20)",
+      "ibc/23104D411A6EB6031FA92FB75F227422B84989969E91DCAD56A535DD7FF0A373": "IBC voucher of Noble USDY on Osmosis: ICS-20 escrows the original on Noble, already in Noble's supply (checked 2026-11-20)"
+    }
+  },
+  "USYC": {
+    "label": "Circle USYC",
+    "full_name": "Circle US Yield Coin",
+    "note": "Issued by Circle (formerly Hashnote). Almost all of the supply sits on BNB Chain",
+    "expect_name": [
+      "US Yield Coin"
+    ],
+    "rwa_slug": "USYC",
+    "address_source": "DefiLlama-Adapters projects/hashnote/index.js (Ethereum, BSC, NEAR, Noble) and rwa.xyz token list (Solana; Arc listed at 0, not read), cross-checked on-chain (token name, 2 providers) on 2026-11-20",
+    "tokens": [
+      {
+        "chain": "ethereum",
+        "class": "USYC",
+        "kind": "evm",
+        "address": "0x136471a34f6ef19fE571EFFC1CA711fdb8E49f2b",
+        "rpcs": [
+          "https://ethereum-rpc.publicnode.com",
+          "https://eth.drpc.org"
+        ]
+      },
+      {
+        "chain": "bsc",
+        "class": "USYC",
+        "kind": "evm",
+        "address": "0x8D0fA28f221eB5735BC71d3a0Da67EE5bC821311",
+        "rpcs": [
+          "https://bsc-dataseed.bnbchain.org",
+          "https://bsc-dataseed1.defibit.io"
+        ]
+      },
+      {
+        "chain": "solana",
+        "class": "USYC",
+        "kind": "solana",
+        "address": "7LWanZteUKtvFjv4MHYgKXXdAuCQYFPJysL9pxxdRQGn",
+        "rpcs": [
+          "https://api.mainnet-beta.solana.com",
+          "https://solana-mainnet.gateway.tatum.io"
+        ]
+      },
+      {
+        "chain": "noble",
+        "class": "USYC",
+        "kind": "cosmos",
+        "address": "uusyc",
+        "rpcs": [
+          "https://rest.cosmos.directory/noble",
+          "https://api.noble.xyz"
+        ]
+      },
+      {
+        "chain": "near",
+        "class": "USYC",
+        "kind": "near",
+        "address": "usyc.near",
+        "rpcs": [
+          "https://rpc.mainnet.near.org",
+          "https://free.rpc.fastnear.com"
+        ]
+      }
+    ],
+    "coingecko": "hashnote-usyc"
+  },
+  "OUSG": {
+    "label": "Ondo OUSG",
+    "full_name": "Ondo Short-Term U.S. Government Bond Fund",
+    "note": "Issued by Ondo. Its largest chain is the XRP Ledger, not Ethereum",
+    "expect_name": [
+      "Ondo",
+      "ondo.finance"
+    ],
+    "rwa_slug": "OUSG",
+    "address_source": "rwa.xyz token list, cross-checked on-chain (token name, 2 providers); XRPL issuer domain is ondo.finance. Solana mint carries no on-chain name, so its name check is off",
+    "tokens": [
+      {
+        "chain": "ethereum",
+        "class": "OUSG",
+        "kind": "evm",
+        "address": "0x1B19C19393e2d034D8Ff31ff34c81252FcBbee92",
+        "rpcs": [
+          "https://ethereum-rpc.publicnode.com",
+          "https://eth.drpc.org"
+        ]
+      },
+      {
+        "chain": "xrpl",
+        "class": "OUSG",
+        "kind": "xrpl",
+        "address": "OUSG-rHuiXXjHLpMP8ZE9sSQU5aADQVWDwv6h5p",
+        "rpcs": [
+          "https://xrplcluster.com",
+          "https://s1.ripple.com:51234"
+        ],
+        "rwa_address": "rHuiXXjHLpMP8ZE9sSQU5aADQVWDwv6h5p"
+      },
+      {
+        "chain": "polygon",
+        "class": "OUSG",
+        "kind": "evm",
+        "address": "0xbA11C5effA33c4D6F8f593CFA394241CfE925811",
+        "rpcs": [
+          "https://polygon-bor-rpc.publicnode.com",
+          "https://polygon.drpc.org"
+        ]
+      },
+      {
+        "chain": "solana",
+        "class": "OUSG",
+        "kind": "solana",
+        "address": "i7u4r16TcsJTgq1kAG8opmVZyVnAKBwLKu6ZPMwzxNc",
+        "rpcs": [
+          "https://api.mainnet-beta.solana.com",
+          "https://solana-mainnet.gateway.tatum.io"
+        ],
+        "expect_name": [
+          ""
+        ]
+      }
+    ],
+    "coingecko": "ousg"
+  },
+  "JTRSY": {
+    "label": "Janus Henderson JTRSY",
+    "full_name": "Janus Henderson Anemoy Treasury Fund",
+    "note": "Tokenized by Centrifuge (Anemoy). Sky's Grove raised its exposure limit to $1.5B in October 2026 (Sky governance forum)",
+    "expect_name": [
+      "Janus Henderson"
+    ],
+    "rwa_slug": "JTRSY",
+    "address_source": "rwa.xyz token list and DefiLlama-Adapters projects/anemoy-capital (Ethereum, Base, Celo), cross-checked on-chain (token name, 2 providers) on 2026-11-20",
+    "tokens": [
+      {
+        "chain": "ethereum",
+        "class": "JTRSY",
+        "kind": "evm",
+        "address": "0x8c213ee79581ff4984583c6a801e5263418c4b86",
+        "rpcs": [
+          "https://ethereum-rpc.publicnode.com",
+          "https://eth.drpc.org"
+        ]
+      },
+      {
+        "chain": "base",
+        "class": "JTRSY",
+        "kind": "evm",
+        "address": "0x8c213ee79581ff4984583c6a801e5263418c4b86",
+        "rpcs": [
+          "https://mainnet.base.org",
+          "https://base.drpc.org"
+        ]
+      },
+      {
+        "chain": "stellar",
+        "class": "JTRSY",
+        "kind": "soroban",
+        "address": "CBHOEKLWTB6HR2A3IXHIIMQG5FOXWXS6EG4Q5YJDRPMXPCX7M24CYR2O",
+        "rpcs": [
+          "https://soroban-rpc.mainnet.stellar.gateway.fm",
+          "https://rpc.lightsail.network"
+        ],
+        "expect_name": [
+          "JanusHenderson"
+        ]
+      },
+      {
+        "chain": "monad",
+        "class": "JTRSY",
+        "kind": "evm",
+        "address": "0xc18e6f730896971a79d748e8dea61067a9bc6040",
+        "rpcs": [
+          "https://rpc.monad.xyz",
+          "https://monad-mainnet.drpc.org"
+        ]
+      },
+      {
+        "chain": "plume",
+        "class": "JTRSY",
+        "kind": "evm",
+        "address": "0xa5d465251fbcc907f5dd6bb2145488dfc6a2627b",
+        "rpcs": [
+          "https://rpc.plume.org",
+          "https://plume.drpc.org"
+        ]
+      },
+      {
+        "chain": "bsc",
+        "class": "JTRSY",
+        "kind": "evm",
+        "address": "0xa5d465251fbcc907f5dd6bb2145488dfc6a2627b",
+        "rpcs": [
+          "https://bsc-dataseed.bnbchain.org",
+          "https://bsc-dataseed1.defibit.io"
+        ]
+      },
+      {
+        "chain": "arbitrum",
+        "class": "JTRSY",
+        "kind": "evm",
+        "address": "0x8c213ee79581ff4984583c6a801e5263418c4b86",
+        "rpcs": [
+          "https://arb1.arbitrum.io/rpc",
+          "https://arb-pokt.nodies.app"
+        ]
+      },
+      {
+        "chain": "avalanche",
+        "class": "JTRSY",
+        "kind": "evm",
+        "address": "0xa5d465251fbcc907f5dd6bb2145488dfc6a2627b",
+        "rpcs": [
+          "https://avalanche-c-chain-rpc.publicnode.com",
+          "https://api.avax.network/ext/bc/C/rpc"
+        ]
+      },
+      {
+        "chain": "celo",
+        "class": "JTRSY",
+        "kind": "evm",
+        "address": "0x27e8c820d05aea8824b1ac35116f63f9833b54c8",
+        "rpcs": [
+          "https://forno.celo.org",
+          "https://celo.drpc.org"
+        ]
+      }
+    ],
+    "coingecko": "janus-henderson-anemoy-treasury-fund"
   }
 }

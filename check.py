@@ -11,6 +11,7 @@ from decimal import Decimal
 from pathlib import Path
 
 import soroban
+import sources
 
 try:
     import rwa  # optional comparison module, not part of ties-model
@@ -132,7 +133,35 @@ def read_starknet(url, address):
     return {"name": byte_array(call(STARKNET_NAME)), "supply": supply, "at": f"block {block}"}
 
 
-READERS = {"evm": read_evm, "solana": read_solana, "aptos": read_aptos, "stellar": read_stellar, "starknet": read_starknet,
+def xrpl_currency(code):
+    """XRPL currency field: 3-letter codes as is, longer ones as 40 hex chars (OUSG -> 4F555347 padded)."""
+    return code if len(code) == 3 else code.encode().hex().upper().ljust(40, "0")
+
+
+def read_xrpl(url, asset_id):
+    """Issued currency on the XRP Ledger: the issuer's obligations (everything held on trustlines) at a validated ledger."""
+    code, issuer = asset_id.split("-")
+    res = jsonrpc(url, "gateway_balances", [{"account": issuer, "ledger_index": "validated", "strict": True}])
+    ledger = res["ledger_index"]
+    acct = jsonrpc(url, "account_info", [{"account": issuer, "ledger_index": ledger}])["account_data"]
+    domain = bytes.fromhex(acct.get("Domain", "")).decode(errors="replace")
+    supply = Decimal(res.get("obligations", {}).get(xrpl_currency(code), "0"))
+    return {"name": f"{code} ({domain})", "supply": supply, "at": f"validated ledger {ledger}"}
+
+
+def read_near(url, account):
+    """NEP-141 token on NEAR: ft_total_supply and ft_metadata, the second pinned to the first call's final block."""
+    def view(method, block):
+        ref = {"block_id": block} if block else {"finality": "final"}
+        return jsonrpc(url, "query", {"request_type": "call_function", "account_id": account, "method_name": method,
+                                      "args_base64": "e30=", **ref})  # e30= is base64 of {}
+    total = view("ft_total_supply", None)
+    meta = json.loads(bytes(view("ft_metadata", total["block_height"])["result"]))
+    supply = Decimal(int(json.loads(bytes(total["result"])))).scaleb(-meta["decimals"])
+    return {"name": meta["name"], "supply": supply, "at": f"final block {total['block_height']}"}
+
+
+READERS = {"xrpl": read_xrpl, "near": read_near, "evm": read_evm, "solana": read_solana, "aptos": read_aptos, "stellar": read_stellar, "starknet": read_starknet,
            "soroban": lambda url, address: soroban.read_soroban(url, address, jsonrpc),
            "aptos-coin": read_aptos_coin, "sui": read_sui, "cosmos": read_cosmos}
 
@@ -191,6 +220,8 @@ def run_fund(fund, cfg, taken):
     extra = {}
     if rwa:
         rows, extra["rwa_updated"] = rwa.annotate(rows, cfg["rwa_slug"])
+    if cfg.get("coingecko"):
+        extra["coingecko"] = sources.coingecko(cfg["coingecko"])
     (HERE / "snapshots").mkdir(exist_ok=True)
     (HERE / "snapshots" / f"{fund}-{taken}.json").write_text(
         json.dumps({"fund": fund, "taken": taken, **extra, "rows": rows}, indent=1, default=str))

@@ -9,8 +9,12 @@ Live output, every night: https://ties-onchain.github.io
 | BlackRock BUIDL | Ethereum (BUIDL and BUIDL-I), Solana, Avalanche, BNB Chain, Aptos, Optimism, Tempo, Arbitrum, Polygon | none public (private fund) |
 | Franklin BENJI | Stellar, Base, Arbitrum, Ethereum, Avalanche, Polygon, Aptos, Solana | SEC Form N-MFP3 (FOBXX), daily flows |
 | Spiko EUTBL | Ethereum, Arbitrum, Base, Polygon, Etherlink, Starknet, Stellar | the prospectus names these 7 contracts as the share register |
+| Ondo USDY | Ethereum, Solana, Stellar, Aptos, Sui, Noble, Arbitrum, BNB Chain, Mantle, Sei, Plume, Tempo | none public daily (tokenized note) |
+| Circle USYC | BNB Chain, Ethereum, Solana, Noble, NEAR | not compared yet |
+| Ondo OUSG | XRP Ledger, Ethereum, Polygon, Solana | not compared yet |
+| Janus Henderson JTRSY | Ethereum, Base, Stellar, Monad, Plume, BNB Chain, Arbitrum, Avalanche, Celo | not compared yet |
 
-Every address and where it came from is in `funds.json`.
+Every address and where it came from is in `funds.json`. `sources.py` reads CoinGecko's supply for the same fund, shown next to the chains on the page.
 
 ## Run it
 
