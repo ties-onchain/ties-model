@@ -77,17 +77,17 @@
         ],
         "events": {
           "rpcs": [
-            "https://bsc.rpc.blxrbdn.com"
+            "https://bsc.publicnode.com"
           ],
-          "span": 4999,
+          "span": 50000,
           "one_query": true,
           "labels": false,
-          "recent": {
-            "days": 2,
-            "rpcs": [
-              "https://bsc-rpc.publicnode.com"
-            ],
-            "span": 50000
+          "max_age_days": 2,
+          "note": "bsc.publicnode.com keeps about 2 days of logs and returns [] (no error) for older ranges, measured 2026-11-20; official dataseeds refuse eth_getLogs; Etherscan v2 free tier excludes BNB Chain",
+          "lost_days": {
+            "2026-11-16": "archived as empty by a node that had pruned its logs (supply moved, events 0); no free BNB Chain log source keeps that day (checked 2026-11-20)",
+            "2026-11-17": "archived as empty by a node that had pruned its logs (supply moved, events 0); no free BNB Chain log source keeps that day (checked 2026-11-20)",
+            "2026-11-18": "archived as empty by a node that had pruned its logs (supply moved, events 0); no free BNB Chain log source keeps that day (checked 2026-11-20)"
           }
         }
       },

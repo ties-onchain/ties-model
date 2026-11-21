@@ -550,6 +550,18 @@ class ArchiveTest(unittest.TestCase):
         self.assertFalse(events.archive_path("F", "aptos", "2026-11-01").exists())
         self.assertEqual(json.loads(gzip.decompress(events.archive_path("F", "base", "2026-11-02").read_bytes())), [{"chain": "base", "day": "2026-11-02"}])
 
+    def test_node_with_short_memory_never_archives_an_old_day_as_empty(self):
+        from datetime import date, timedelta
+        today = date.today()
+        old, recent, lost = (str(today - timedelta(days=n)) for n in (5, 1, 4))
+        token = {"chain": "bsc", "kind": "evm", "events": {"max_age_days": 2, "lost_days": {lost: "checked"}}}
+        asked = []
+        failed = events.capture("F", [token], [old, lost, recent], lambda t, s, e: asked.append(s[:10]) or [])
+        self.assertEqual(asked, [recent])                                   # only the day the node still keeps
+        self.assertFalse(events.archive_path("F", "bsc", old).exists())     # missing reads as incomplete, never as zero
+        self.assertIn("older than the 2 days its node keeps", failed["bsc"])  # and it is said out loud
+        self.assertNotIn(lost, failed["bsc"])                               # a checked, documented loss does not nag
+
     def test_month_comes_from_the_archive_only_when_every_day_is_there(self):
         token = {"chain": "base", "kind": "evm", "events": {}}
         events.capture("F", [token], events.month_days("2026-02"), lambda t, s, e: [{"day": s[:10]}])

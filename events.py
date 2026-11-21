@@ -531,10 +531,19 @@ def capture(fund, tokens, days, read=read_raw):
     """Archive each listed day for every chain with a reader; days already archived are skipped. Returns {chain: first
     error}: a failing day or chain does not stop the others."""
     failed = {}
+    today = datetime.now(timezone.utc).date()
     for t in filter(readable, tokens):
+        # Some free nodes keep only recent logs and answer "no events" for older ranges, without an error. A day older
+        # than events.max_age_days is never archived from them: a missing day reads as incomplete, a false empty as truth.
+        max_age = (t.get("events") or {}).get("max_age_days")
         for day in days:
             path = archive_path(fund, slot(t), day)
             if path.exists():
+                continue
+            if day in (t.get("events") or {}).get("lost_days", {}):  # checked, unrecoverable from free sources, reason in funds.json
+                continue
+            if max_age is not None and (today - date.fromisoformat(day)).days > max_age:
+                failed.setdefault(t["chain"], f"{day}: older than the {max_age} days its node keeps, not archived")
                 continue
             try:
                 moves = read(t, f"{day}T00:00:00Z", f"{date.fromisoformat(day) + timedelta(days=1)}T00:00:00Z")
