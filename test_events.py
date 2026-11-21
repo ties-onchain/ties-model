@@ -642,9 +642,29 @@ class ClosureTest(unittest.TestCase):
         rows = events.closure("F", before, after, ISS, load=load)
         self.assertEqual([(r["chain"], r["status"], r.get("gap")) for r in rows], [("base", "gap", Decimal(6)), ("aptos", "archive incomplete", None)])
 
-    def test_claimable_balance_to_the_issuer_counts_as_a_burn(self):
-        ccb = {"id": str(7 << 32), "type": "create_claimable_balance", "amount": "50.19", "source_account": "GH", "claimants": [{"destination": ISS}]}
-        self.assertEqual(events.supply_effect("stellar", ccb, ISS), (7, Decimal("-50.19")))
+    def test_redemption_request_burns_when_the_issuer_claims_it_not_when_filed(self):
+        # BENJI, 14 Nov 2026: a holder locked 111.6177902 for the issuer; Franklin claimed it on 16 Nov. Supply counts
+        # claimable balances, so the filing moves nothing and the claim is the burn.
+        filed = {"id": str(7 << 32), "type": "create_claimable_balance", "amount": "111.6177902", "source_account": "GH",
+                 "claimants": [{"destination": "GH"}, {"destination": ISS}]}
+        claim = {"id": str(9 << 32), "type": "claim_claimable_balance", "amount": "111.6177902", "source_account": ISS}
+        took_back = {"id": str(9 << 32), "type": "claim_claimable_balance", "amount": "111.6177902", "source_account": "GH"}
+        issued = {"id": str(3 << 32), "type": "create_claimable_balance", "amount": "5", "source_account": ISS, "claimants": [{"destination": "GH"}]}
+        self.assertEqual(events.supply_effect("stellar", filed, ISS), (7, 0))
+        self.assertEqual(events.supply_effect("stellar", claim, ISS), (9, Decimal("-111.6177902")))
+        self.assertEqual(events.supply_effect("stellar", took_back, ISS), (9, 0))   # never burned
+        self.assertEqual(events.supply_effect("stellar", issued, ISS), (3, Decimal(5)))
+
+    def test_issuer_claims_are_archived_with_the_amount_from_their_effect(self):
+        ops = [{"id": "1", "type": "claim_claimable_balance", "source_account": ISS, "created_at": "2026-11-16T12:31:27Z", "balance_id": "00b"},
+               {"id": "2", "type": "claim_claimable_balance", "source_account": ISS, "created_at": "2026-11-16T12:40:00Z", "balance_id": "00c"},
+               {"id": "3", "type": "payment", "asset_code": "BENJI", "from": ISS, "to": "GH", "amount": "1", "created_at": "2026-11-16T13:00:00Z"}]
+        effects = {"1": [{"type": "claimable_balance_claimed", "asset": f"BENJI:{ISS}", "amount": "111.6177902"}],
+                   "2": [{"type": "claimable_balance_claimed", "asset": "OTHER:GX", "amount": "9"}]}
+        with mock.patch.object(events, "fetch", lambda *a, **k: [dict(o) for o in ops]):
+            out = events.stellar_ops("https://h", "BENJI", ISS, "s", "e",
+                                     get=lambda url: {"_embedded": {"records": effects[url.split("/")[-2]]}})
+        self.assertEqual([(o["id"], o.get("amount")) for o in out], [("1", "111.6177902"), ("3", "1")])  # another asset's claim is dropped
 
     def test_read_block_parses_every_snapshot_format(self):
         self.assertEqual([events.read_block(a) for a in ("ledger 65394755", "finalized block 55341176", "ledger version 7978034023",

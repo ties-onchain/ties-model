@@ -41,7 +41,8 @@ ZERO_TOPIC = "0x" + "0" * 64
 CX_TOPICS = ("0x92a2e75dcc9a877e15e8c693d39030c8d8a6d772c9178427a8678461af9f58fc",  # Franklin InstantCXTransferOut(address,uint256,string)
              "0x1916d8e383c33d1b51f2fa903da30c5d1e0a477cbc6b815b9ac0d23599a7dc1a")  # InstantCXTransferIn(address,uint256,uint256,string)
 ETHERSCAN = "https://api.etherscan.io/v2/api"  # one free key for many chains, 3 calls/s, 100k calls/day
-KEEP = ("id", "type", "created_at", "transaction_hash", "source_account", "from", "to", "asset_code", "asset", "amount", "claimants")
+KEEP = ("id", "type", "created_at", "transaction_hash", "source_account", "from", "to", "asset_code", "asset", "amount", "claimants",
+        "balance_id", "claimant")
 
 
 def stamp(iso):
@@ -505,12 +506,31 @@ def cached(path, pull):
     return json.loads(path.read_text())
 
 
+def claimed(horizon, op, get=http_json):
+    """A claim op names only a balance id; its asset and amount live in the op's claimable_balance_claimed effect."""
+    effects = get(f"{horizon}/operations/{op['id']}/effects")["_embedded"]["records"]
+    hit = next((e for e in effects if e["type"] == "claimable_balance_claimed"), None)
+    return {**op, "asset": hit["asset"], "amount": hit["amount"]} if hit else op
+
+
+def stellar_ops(horizon, code, issuer, start, end, get=http_json, sleep=time.sleep):
+    """Token operations on the issuer account, plus the issuer's claims of claimable balances (the moment a redemption
+    request held for the issuer leaves supply), which name no asset until their effect is read."""
+    out = []
+    for o in fetch(horizon, issuer, start, end, get, sleep):
+        if o["type"] == "claim_claimable_balance" and o.get("source_account") == issuer:
+            o = claimed(horizon, o, get)
+        if is_token(o, code, issuer):
+            out.append(o)
+    return out
+
+
 def read_raw(token, start, end):
     """What gets archived per chain: issuer operations on Stellar (token ones only), supply moves elsewhere."""
     if token["kind"] != "stellar":
         return read_events(token, start, end)
     code, issuer = token["address"].split("-")
-    return [o for o in fetch("https://horizon.stellar.org", issuer, start, end) if is_token(o, code, issuer)]
+    return stellar_ops("https://horizon.stellar.org", code, issuer, start, end)
 
 
 def archive_path(fund, chain, day):
@@ -628,17 +648,20 @@ def read_block(at):
 
 
 def supply_effect(chain, item, issuer=None):
-    """(block, signed supply change) of one archived item. A Stellar claimable balance left to the issuer counts when it is
-    created; Horizon's supply drops only when the issuer claims it, so a pending one shows as a gap until then. Moves (every
-    reader but classic Stellar, which archives raw Horizon operations) carry their side."""
+    """(block, signed supply change) of one archived item. Moves (every reader but classic Stellar, which archives raw
+    Horizon operations) carry their side."""
     if "side" in item:
         sign = {"mint": 1, "burn": -1}.get(item["side"], 0)
         return item["block"], sign * Decimal(item["amount"])
     ledger, amount = int(item["id"]) >> 32, Decimal(item.get("amount", "0"))  # Horizon op ids carry the ledger in the high bits
     if item["type"] == "payment":
         return ledger, amount if item["from"] == issuer else -amount if item["to"] == issuer else 0
-    if item["type"] == "create_claimable_balance" and item["source_account"] != issuer and any(c["destination"] == issuer for c in item["claimants"]):
+    # Supply (check.stellar_supply) counts claimable balances, so locking tokens for the issuer changes nothing; the burn is
+    # the issuer's claim. A holder who takes the balance back never burned. A balance the issuer creates is a mint.
+    if item["type"] == "claim_claimable_balance" and item.get("source_account") == issuer:
         return ledger, -amount
+    if item["type"] == "create_claimable_balance" and item["source_account"] == issuer:
+        return ledger, amount
     return ledger, 0
 
 
