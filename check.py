@@ -3,6 +3,7 @@
 Usage: python3 check.py [FUND ...]   (default: every fund in funds.json; writes snapshots/FUND-<time>.json)
 """
 import json
+import os
 import sys
 import time
 import urllib.request
@@ -24,9 +25,14 @@ NAME, DECIMALS, TOTAL_SUPPLY = "0x06fdde03", "0x313ce567", "0x18160ddd"
 TOLERANCE = Decimal("0.01")  # one cent of a $1 share: below that, sources agree
 
 
+KEYS = {"solana-mainnet.gateway.tatum.io": ("x-api-key", "TATUM_API_KEY")}  # free keys lift per-minute limits; no key = public tier
+
+
 def http_json(url, payload=None, headers=None):
     data = None if payload is None else json.dumps(payload).encode()
-    req = urllib.request.Request(url, data=data, headers=HEADERS | (headers or {}))
+    header, var = KEYS.get(url.split("/")[2], (None, None))
+    keyed = {header: os.environ[var]} if var and os.environ.get(var) else {}
+    req = urllib.request.Request(url, data=data, headers=HEADERS | keyed | (headers or {}))
     with urllib.request.urlopen(req, timeout=30) as resp:
         return json.loads(resp.read())
 
@@ -166,7 +172,7 @@ READERS = {"xrpl": read_xrpl, "near": read_near, "evm": read_evm, "solana": read
            "aptos-coin": read_aptos_coin, "sui": read_sui, "cosmos": read_cosmos}
 
 
-RETRY_WAITS = (3, 10)  # seconds; public RPCs rate-limit (429) and blip, a nightly job should outlast that
+RETRY_WAITS = (3, 10, 30)  # seconds; public RPCs rate-limit (429) and blip; the 30 s try outlasts a per-minute limit (Tatum on Solana)
 
 
 def read_with_retry(read, url, address, waits=RETRY_WAITS, sleep=time.sleep):

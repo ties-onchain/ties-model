@@ -163,3 +163,25 @@ class XrplNearTest(unittest.TestCase):
         with mock.patch.object(check, "jsonrpc", rpc):
             out = check.read_near("https://n.io", "usyc.near")
         self.assertEqual((out["supply"], refs), (Decimal("123.456789"), ["final", 42]))
+
+
+class KeyedProviderTest(unittest.TestCase):
+    def test_tatum_gets_its_key_only_when_set(self):
+        seen = []
+
+        class Resp:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *a):
+                return False
+
+            def read(self):
+                return b"{}"
+        with mock.patch.object(check.urllib.request, "urlopen", lambda req, timeout: seen.append(dict(req.header_items())) or Resp()):
+            with mock.patch.dict(check.os.environ, {"TATUM_API_KEY": "t-1"}):
+                check.http_json("https://solana-mainnet.gateway.tatum.io", {"a": 1})
+                check.http_json("https://api.mainnet-beta.solana.com", {"a": 1})
+            with mock.patch.dict(check.os.environ, {}, clear=True):
+                check.http_json("https://solana-mainnet.gateway.tatum.io", {"a": 1})
+        self.assertEqual([h.get("X-api-key") for h in seen], ["t-1", None, None])
