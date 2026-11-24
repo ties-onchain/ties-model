@@ -1,0 +1,152 @@
+{
+ "taken": "2026-11-24T00:00Z",
+ "funds": {
+  "BUIDL": {
+   "checked": [
+    "ethereum",
+    "solana"
+   ],
+   "skipped": [],
+   "flags": [
+    {
+     "chain": "solana",
+     "holder": "8BJHEhSWJug1Tb6atcyLjZcCNcoX6Gfzo48CXAmU6ZSj",
+     "balance": "116069107.42",
+     "name": "",
+     "matches": [
+      "aptos",
+      "arbitrum",
+      "optimism",
+      "tempo"
+     ],
+     "exact": false,
+     "gap": "98144.800000",
+     "why": "balance equals supply on aptos, arbitrum, optimism, tempo"
+    }
+   ],
+   "chains": [
+    "aptos",
+    "arbitrum",
+    "avalanche",
+    "bsc",
+    "ethereum",
+    "optimism",
+    "polygon",
+    "solana",
+    "tempo"
+   ]
+  },
+  "BENJI": {
+   "checked": [
+    "ethereum",
+    "solana",
+    "stellar"
+   ],
+   "skipped": [],
+   "flags": [],
+   "chains": [
+    "aptos",
+    "arbitrum",
+    "avalanche",
+    "base",
+    "ethereum",
+    "polygon",
+    "solana",
+    "stellar"
+   ]
+  },
+  "EUTBL": {
+   "checked": [
+    "ethereum"
+   ],
+   "skipped": [],
+   "flags": [],
+   "chains": [
+    "arbitrum",
+    "base",
+    "ethereum",
+    "etherlink",
+    "polygon",
+    "starknet",
+    "stellar"
+   ]
+  },
+  "USDY": {
+   "checked": [
+    "ethereum",
+    "solana",
+    "stellar"
+   ],
+   "skipped": [],
+   "flags": [],
+   "chains": [
+    "aptos",
+    "arbitrum",
+    "bsc",
+    "ethereum",
+    "mantle",
+    "noble",
+    "sei",
+    "solana",
+    "stellar",
+    "sui",
+    "tempo"
+   ]
+  },
+  "USYC": {
+   "checked": [
+    "ethereum",
+    "solana"
+   ],
+   "skipped": [],
+   "flags": [],
+   "chains": [
+    "bsc",
+    "ethereum",
+    "solana"
+   ]
+  },
+  "OUSG": {
+   "checked": [
+    "ethereum",
+    "solana"
+   ],
+   "skipped": [],
+   "flags": [],
+   "chains": [
+    "ethereum",
+    "xrpl"
+   ]
+  },
+  "JTRSY": {
+   "checked": [
+    "ethereum"
+   ],
+   "skipped": [],
+   "flags": [
+    {
+     "chain": "ethereum",
+     "holder": "0x528d8682856e201f014Eb63EeE519d489dfaF25d",
+     "balance": "4547091.586898",
+     "name": "",
+     "matches": [
+      "stellar"
+     ],
+     "exact": true,
+     "gap": "0.000001000000000000",
+     "why": "balance equals supply on stellar"
+    }
+   ],
+   "chains": [
+    "arbitrum",
+    "avalanche",
+    "base",
+    "bsc",
+    "ethereum",
+    "monad",
+    "plume",
+    "stellar"
+   ]
+  }
+ }
+}

@@ -22,6 +22,38 @@ def ok(supply, name="BlackRock USD Institutional Digital Liquidity Fund"):
     return {"name": name, "supply": Decimal(supply), "at": "block 1"}
 
 
+class SameHeightTest(unittest.TestCase):
+    """Both providers read at the lower of their two finalized heads, so agreement means the same block."""
+    def setup(self, fail_pinned_on=None):
+        seen = []
+
+        def read(url, _address, height=None):
+            host = url.split("/")[2]
+            seen.append((host, height))
+            if height is not None and host == fail_pinned_on:
+                raise OSError("state not available")
+            return {"name": "BlackRock", "supply": Decimal("5"), "at": f"block {height or 'own'}"}
+        heads = {"fake": lambda url: {"a.io": 120, "b.io": 117}[url.split("/")[2]]}
+        row = check.check_token(TOKEN, ["BlackRock"], {"fake": read}, sleep=lambda _s: None, heads=heads)
+        return row, seen
+
+    def test_both_read_at_the_lower_head(self):
+        row, seen = self.setup()
+        self.assertEqual(seen, [("a.io", 117), ("b.io", 117)])
+        self.assertTrue(row["same_height"])
+        self.assertEqual(row["status"], "ok")
+
+    def test_a_node_that_cannot_serve_the_height_falls_back_and_says_so(self):
+        row, _ = self.setup(fail_pinned_on="b.io")
+        self.assertEqual(row["status"], "ok")
+        self.assertFalse(row["same_height"])
+        self.assertTrue(row["reads"][1]["unpinned"])
+
+    def test_chains_without_history_are_not_pinned(self):
+        row = check.check_token(TOKEN, ["BlackRock"], readers({"a.io": ok("1"), "b.io": ok("1")}), sleep=lambda _s: None, heads={})
+        self.assertFalse(row["same_height"])
+
+
 class CheckTokenTest(unittest.TestCase):
     def run_check(self, a, b):
         return check.check_token(TOKEN, ["BlackRock"], readers({"a.io": a, "b.io": b}), sleep=lambda _s: None)

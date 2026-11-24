@@ -1,0 +1,14 @@
+{
+ "BENJI": {
+  "2026-09-30": {
+   "onchain": "668200000",
+   "approx": true,
+   "how": "Rebuilt after the fact: Stellar by replaying 36,697 issuer operations, EVM chains read at their last block of the day, Aptos and Solana estimated from later reads."
+  },
+  "2026-10-31": {
+   "onchain": "833848260",
+   "approx": true,
+   "how": "Rebuilt after the fact: Stellar by replaying issuer operations, EVM chains and Aptos read at their last block of the day, Solana from a later read."
+  }
+ }
+}

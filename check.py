@@ -50,8 +50,12 @@ def abi_string(hexdata):
     return raw[64:64 + length].decode(errors="replace")
 
 
-def read_evm(url, address):
-    block = jsonrpc(url, "eth_getBlockByNumber", ["finalized", False])["number"]
+def evm_head(url):
+    return int(jsonrpc(url, "eth_getBlockByNumber", ["finalized", False])["number"], 16)
+
+
+def read_evm(url, address, height=None):
+    block = hex(height) if height is not None else jsonrpc(url, "eth_getBlockByNumber", ["finalized", False])["number"]
     call = lambda data: jsonrpc(url, "eth_call", [{"to": address, "data": data}, block])
     decimals = int(call(DECIMALS), 16)
     supply = Decimal(int(call(TOTAL_SUPPLY), 16)).scaleb(-decimals)
@@ -66,17 +70,21 @@ def read_solana(url, mint):
     return {"name": name, "supply": Decimal(res["value"]["uiAmountString"]), "at": f"finalized slot {res['context']['slot']}"}
 
 
-def read_aptos(base, metadata):
-    version = http_json(base)["ledger_version"]  # pin both reads to one ledger version
+def aptos_head(base):
+    return int(http_json(base)["ledger_version"])
+
+
+def read_aptos(base, metadata, height=None):
+    version = height if height is not None else http_json(base)["ledger_version"]  # pin both reads to one ledger version
     resource = lambda r: http_json(f"{base}/accounts/{metadata}/resource/0x1::fungible_asset::{r}?ledger_version={version}")["data"]
     meta = resource("Metadata")
     supply = Decimal(int(resource("ConcurrentSupply")["current"]["value"])).scaleb(-meta["decimals"])
     return {"name": meta["name"], "supply": supply, "at": f"ledger version {version}"}
 
 
-def read_aptos_coin(base, coin_type):
+def read_aptos_coin(base, coin_type, height=None):
     """Legacy Aptos coin (module::struct type, e.g. Ondo's USDY): supply, name and decimals from the framework's view functions."""
-    version = http_json(base)["ledger_version"]
+    version = height if height is not None else http_json(base)["ledger_version"]
     view = lambda fn: http_json(f"{base}/view?ledger_version={version}",
                                 {"function": f"0x1::coin::{fn}", "type_arguments": [coin_type], "arguments": []})[0]
     supply = Decimal(int(view("supply")["vec"][0])).scaleb(-int(view("decimals")))
@@ -130,8 +138,12 @@ def byte_array(felts):
     return (b"".join(words) + int(felts[1 + full], 16).to_bytes(pending_len, "big")).decode(errors="replace")
 
 
-def read_starknet(url, address):
-    block = jsonrpc(url, "starknet_blockNumber", [])  # pin all calls to one block
+def starknet_head(url):
+    return int(jsonrpc(url, "starknet_blockNumber", []))
+
+
+def read_starknet(url, address, height=None):
+    block = height if height is not None else jsonrpc(url, "starknet_blockNumber", [])  # pin all calls to one block
     call = lambda sel: jsonrpc(url, "starknet_call", {"request": {"contract_address": address, "entry_point_selector": sel, "calldata": []},
                                                       "block_id": {"block_number": block}})
     low, high = (int(v, 16) for v in call(STARKNET_TOTAL_SUPPLY)[:2])
@@ -144,10 +156,14 @@ def xrpl_currency(code):
     return code if len(code) == 3 else code.encode().hex().upper().ljust(40, "0")
 
 
-def read_xrpl(url, asset_id):
+def xrpl_head(url):
+    return int(jsonrpc(url, "ledger", [{"ledger_index": "validated"}])["ledger_index"])
+
+
+def read_xrpl(url, asset_id, height=None):
     """Issued currency on the XRP Ledger: the issuer's obligations (everything held on trustlines) at a validated ledger."""
     code, issuer = asset_id.split("-")
-    res = jsonrpc(url, "gateway_balances", [{"account": issuer, "ledger_index": "validated", "strict": True}])
+    res = jsonrpc(url, "gateway_balances", [{"account": issuer, "ledger_index": height if height is not None else "validated", "strict": True}])
     ledger = res["ledger_index"]
     acct = jsonrpc(url, "account_info", [{"account": issuer, "ledger_index": ledger}])["account_data"]
     domain = bytes.fromhex(acct.get("Domain", "")).decode(errors="replace")
@@ -155,13 +171,17 @@ def read_xrpl(url, asset_id):
     return {"name": f"{code} ({domain})", "supply": supply, "at": f"validated ledger {ledger}"}
 
 
-def read_near(url, account):
+def near_head(url):
+    return int(jsonrpc(url, "block", {"finality": "final"})["header"]["height"])
+
+
+def read_near(url, account, height=None):
     """NEP-141 token on NEAR: ft_total_supply and ft_metadata, the second pinned to the first call's final block."""
     def view(method, block):
         ref = {"block_id": block} if block else {"finality": "final"}
         return jsonrpc(url, "query", {"request_type": "call_function", "account_id": account, "method_name": method,
                                       "args_base64": "e30=", **ref})  # e30= is base64 of {}
-    total = view("ft_total_supply", None)
+    total = view("ft_total_supply", height)
     meta = json.loads(bytes(view("ft_metadata", total["block_height"])["result"]))
     supply = Decimal(int(json.loads(bytes(total["result"])))).scaleb(-meta["decimals"])
     return {"name": meta["name"], "supply": supply, "at": f"final block {total['block_height']}"}
@@ -172,26 +192,51 @@ READERS = {"xrpl": read_xrpl, "near": read_near, "evm": read_evm, "solana": read
            "aptos-coin": read_aptos_coin, "sui": read_sui, "cosmos": read_cosmos}
 
 
+# Chains whose free endpoints answer for a past height: both providers are read at the lower of their two finalized heads,
+# so "the two agree" means the same block, not two blocks a few seconds apart. Solana, Stellar, Soroban, Sui and Cosmos
+# endpoints only serve the latest state; those keep each provider's own latest final read.
+HEADS = {"evm": evm_head, "aptos": aptos_head, "aptos-coin": aptos_head, "starknet": starknet_head, "xrpl": xrpl_head, "near": near_head}
+
 RETRY_WAITS = (3, 10, 30)  # seconds; public RPCs rate-limit (429) and blip; the 30 s try outlasts a per-minute limit (Tatum on Solana)
 
 
-def read_with_retry(read, url, address, waits=RETRY_WAITS, sleep=time.sleep):
+def read_with_retry(read, url, address, waits=RETRY_WAITS, sleep=time.sleep, **kw):
     for wait in waits:
         try:
-            return read(url, address)
+            return read(url, address, **kw)
         except Exception:
             sleep(wait)
-    return read(url, address)
+    return read(url, address, **kw)
 
 
-def check_token(token, expect_names, readers=READERS, sleep=time.sleep):
+def common_height(token, heads=HEADS, sleep=time.sleep):
+    """The lower finalized head of the token's providers, or None when the chain cannot be pinned or a head is unreadable."""
+    head = heads.get(token["kind"])
+    if not head or len(token["rpcs"]) < 2:
+        return None
+    try:
+        return min(read_with_retry(lambda url, _a: head(url), url, None, sleep=sleep) for url in token["rpcs"])
+    except Exception:
+        return None
+
+
+def check_token(token, expect_names, readers=READERS, sleep=time.sleep, heads=HEADS):
     reads, errors = [], []
+    pin = common_height(token, heads, sleep)
     for url in token["rpcs"]:
+        read = readers[token["kind"]]
         try:
-            reads.append({"rpc": url.split("/")[2], **read_with_retry(readers[token["kind"]], url, token["address"], sleep=sleep)})
+            try:
+                got = read_with_retry(read, url, token["address"], sleep=sleep, **({"height": pin} if pin is not None else {}))
+            except Exception:
+                if pin is None:
+                    raise
+                got = {**read_with_retry(read, url, token["address"], sleep=sleep), "unpinned": True}  # this node could not serve the pinned height
+            reads.append({"rpc": url.split("/")[2], **got})
         except Exception as exc:
             errors.append(f"{url.split('/')[2]}: {exc}")
-    row = {**{k: token[k] for k in ("chain", "class", "address")}, "reads": reads, "errors": errors}
+    row = {**{k: token[k] for k in ("chain", "class", "address")}, "reads": reads, "errors": errors,
+           "same_height": pin is not None and len(reads) > 1 and not any(r.get("unpinned") for r in reads)}
     if "rwa_address" in token:  # how rwa.xyz names the same token, when it differs (comparison only)
         row["rwa_address"] = token["rwa_address"]
     if not reads:

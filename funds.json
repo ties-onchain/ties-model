@@ -179,7 +179,8 @@
     "label": "BlackRock BUIDL",
     "full_name": "BlackRock USD Institutional Digital Liquidity Fund",
     "note": "Tokenized by Securitize",
-    "coingecko": "blackrock-usd-institutional-digital-liquidity-fund"
+    "coingecko": "blackrock-usd-institutional-digital-liquidity-fund",
+    "issuer": "BlackRock, via Securitize"
   },
   "BENJI": {
     "label": "Franklin BENJI",
@@ -329,7 +330,8 @@
     "coingecko": "franklin-templeton-benji",
     "coingecko_ignore": {
       "0x4705f33d665762a5371d3b8786e63749814e749295ea73269b379c84b756d83a": "Franklin fund_token management object (FundManagement, ManagedShareHolders resources), not the supply-carrying fungible asset; ties reads 0x1005... (checked 2026-11-20)"
-    }
+    },
+    "issuer": "Franklin Templeton"
   },
   "EUTBL": {
     "label": "Spiko EUTBL",
@@ -418,7 +420,8 @@
         }
       }
     ],
-    "coingecko": "eutbl"
+    "coingecko": "eutbl",
+    "issuer": "Spiko"
   },
   "USDY": {
     "label": "Ondo USDY",
@@ -561,7 +564,8 @@
     "coingecko_ignore": {
       "ibc/6749D16BC09F419C090C330FC751FFF1C96143DB7A4D2FCAEC2F348A3E17618A": "IBC voucher of Noble USDY on Mantra: ICS-20 escrows the original on Noble, already in Noble's supply (checked 2026-11-20)",
       "ibc/23104D411A6EB6031FA92FB75F227422B84989969E91DCAD56A535DD7FF0A373": "IBC voucher of Noble USDY on Osmosis: ICS-20 escrows the original on Noble, already in Noble's supply (checked 2026-11-20)"
-    }
+    },
+    "issuer": "Ondo Finance"
   },
   "USYC": {
     "label": "Circle USYC",
@@ -624,7 +628,8 @@
         ]
       }
     ],
-    "coingecko": "hashnote-usyc"
+    "coingecko": "hashnote-usyc",
+    "issuer": "Circle"
   },
   "OUSG": {
     "label": "Ondo OUSG",
@@ -682,7 +687,8 @@
         ]
       }
     ],
-    "coingecko": "ousg"
+    "coingecko": "ousg",
+    "issuer": "Ondo Finance"
   },
   "JTRSY": {
     "label": "Janus Henderson JTRSY",
@@ -788,6 +794,7 @@
         ]
       }
     ],
-    "coingecko": "janus-henderson-anemoy-treasury-fund"
+    "coingecko": "janus-henderson-anemoy-treasury-fund",
+    "issuer": "Janus Henderson, via Centrifuge"
   }
 }

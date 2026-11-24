@@ -10,11 +10,19 @@ Live output, every night: https://tiesonchain.com
 | Franklin BENJI | Stellar, Base, Arbitrum, Ethereum, Avalanche, Polygon, Aptos, Solana | SEC Form N-MFP3 (FOBXX), daily flows |
 | Spiko EUTBL | Ethereum, Arbitrum, Base, Polygon, Etherlink, Starknet, Stellar | the prospectus names these 7 contracts as the share register |
 | Ondo USDY | Ethereum, Solana, Stellar, Aptos, Sui, Noble, Arbitrum, BNB Chain, Mantle, Sei, Plume, Tempo | none public daily (tokenized note) |
-| Circle USYC | BNB Chain, Ethereum, Solana, Noble, NEAR | not compared yet |
-| Ondo OUSG | XRP Ledger, Ethereum, Polygon, Solana | not compared yet |
-| Janus Henderson JTRSY | Ethereum, Base, Stellar, Monad, Plume, BNB Chain, Arbitrum, Avalanche, Celo | not compared yet |
+| Circle USYC | BNB Chain, Ethereum, Solana, Noble, NEAR | none public daily; CoinGecko compared |
+| Ondo OUSG | XRP Ledger, Ethereum, Polygon, Solana | none public daily; CoinGecko compared |
+| Janus Henderson JTRSY | Ethereum, Base, Stellar, Monad, Plume, BNB Chain, Arbitrum, Avalanche, Celo | none public daily; CoinGecko compared |
 
 Every address and where it came from is in `funds.json`. `sources.py` reads CoinGecko's supply for the same fund, shown next to the chains on the page.
+
+## Two checks on the total
+
+**Same block.** Since 24 Nov 2026, on EVM chains, Aptos, Starknet, the XRP Ledger and NEAR, `check.py` reads both providers at the same block: the lower of their two finalized heads. Solana, Stellar, Sui and Noble's free endpoints only answer for their latest state, so there each provider reads its own latest final block; a change in between shows as a disagreement, never an average. Each row records `same_height`.
+
+**Bridge double count.** Adding chains up is right only when tokens move by burning on one chain and minting on another. A bridge that locks tokens on chain A and mints copies on B counts them twice. `bridges.py` lists the largest holders on Ethereum (Blockscout), Stellar (Horizon, every account) and Solana (largest accounts) and flags any whose balance equals another chain's supply, or a set of them. It names the chains it checked; chains with no free holder list (BNB Chain, for one) are not checked, and the site shows the share of supply covered. Output: `bridges.json`.
+
+**Month-ends before ties started reading** (`rebuilt.json`) were rebuilt once, after the fact: Stellar by replaying the issuer's operations (`events.py`), EVM chains read at their last block of the day, and the rest estimated from later reads. Each date says how it was built and is marked approximate.
 
 ## Run it
 
@@ -23,9 +31,10 @@ python3 check.py                      # supply of every fund on every chain, two
 python3 check.py BENJI                # one fund
 python3 events.py capture BUIDL 7     # archive the last 7 days of mints and burns
 python3 events.py closure BUIDL 2     # do the archived events explain each chain's supply change
+python3 bridges.py                    # is any large holder sitting on another chain's supply (lock-and-mint double count)
 SEC_USER_AGENT="you@example.com" python3 sec.py              # latest N-MFP3 filings
 ETHERSCAN_API_KEY=... python3 events.py BENJI 2026-10       # a month of events vs the SEC daily flows
-python3 -m unittest test_check test_sec test_events test_soroban
+python3 -m unittest test_check test_sec test_events test_soroban test_bridges
 ```
 
 What a read looks like (BENJI, 10 Nov 2026, 21:30 UTC):
