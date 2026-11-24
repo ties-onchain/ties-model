@@ -544,7 +544,8 @@ def slot(token):
 
 
 def readable(token):
-    return token["kind"] == "stellar" or "events" in token
+    """events: false in funds.json opts a token out (a second Stellar class in one fund: the classifier takes one issuer)."""
+    return token.get("events") is not False and (token["kind"] == "stellar" or "events" in token)
 
 
 def capture(fund, tokens, days, read=read_raw):

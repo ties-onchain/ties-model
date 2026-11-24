@@ -792,9 +792,90 @@
           "https://forno.celo.org",
           "https://celo.drpc.org"
         ]
+      },
+      {
+        "chain": "pharos",
+        "class": "JTRSY",
+        "kind": "evm",
+        "address": "0xc18e6f730896971a79d748e8dea61067a9bc6040",
+        "rpcs": [
+          "https://rpc.pharos.xyz"
+        ],
+        "single_ok": "Pharos has one public RPC (rpc.pharos.xyz, chainlist checked 2026-11-24); Centrifuge's own index lists this deployment"
       }
     ],
     "coingecko": "janus-henderson-anemoy-treasury-fund",
     "issuer": "Janus Henderson, via Centrifuge"
+  },
+  "GBENJI": {
+    "label": "Franklin gBENJI",
+    "full_name": "Franklin OnChain U.S. Government Money Fund, Luxembourg share classes",
+    "note": "Issued by Franklin Templeton under its Luxembourg OnChain Funds umbrella. Two share classes on Stellar: gBENJI (ISIN LU2900381208) and grBENJI (LU3258450587, AB Ddis USD). Not on CoinGecko",
+    "expect_name": [
+      "franklintempleton.com"
+    ],
+    "rwa_slug": "gBENJI",
+    "address_source": "Franklin's own stellar.toml (www.franklintempleton.com/.well-known/stellar.toml, read 2026-11-24) names these issuers; issuer home_domain is www.franklintempleton.com; cross-checked against rwa.xyz (its gBENJI page lists both classes)",
+    "issuer": "Franklin Templeton",
+    "tokens": [
+      {
+        "chain": "stellar",
+        "class": "gBENJI",
+        "kind": "stellar",
+        "address": "gBENJI-GD5J73EKK5IYL5XS3FBTHHX7CZIYRP7QXDL57XFWGC2WVYWT326OBXRP",
+        "rpcs": [
+          "https://horizon.stellar.org",
+          "https://horizon.stellar.lobstr.co"
+        ],
+        "rwa_address": "gbenji-gd5j73ekk5iyl5xs3fbthhx7cziyrp7qxdl57xfwgc2wvywt326obxrp-2"
+      },
+      {
+        "chain": "stellar",
+        "class": "grBENJI",
+        "kind": "stellar",
+        "slot": "stellar-grbenji",
+        "events": false,
+        "address": "grBENJI-GA3ZBL3LBRKOF7CZ6MCA7JLPHWQCGYCCGKH4GVWNEDZOXW4IPXFGN2FQ",
+        "rpcs": [
+          "https://horizon.stellar.org",
+          "https://horizon.stellar.lobstr.co"
+        ]
+      }
+    ]
+  },
+  "SGBENJI": {
+    "label": "Franklin sgBENJI",
+    "full_name": "Franklin OnChain U.S. Dollar Short-Term Money Market Fund",
+    "note": "Issued by Franklin Templeton Investments (Singapore VCC, ISIN SGXZ71843866). Most of it lives on the XRP Ledger as a multi-purpose token, the rest on Stellar. Not on CoinGecko",
+    "expect_name": [
+      "franklintempleton.com",
+      "Franklin Templeton"
+    ],
+    "rwa_slug": "sgBENJI",
+    "address_source": "Franklin's own stellar.toml (www.franklintempleton.com/.well-known/stellar.toml, read 2026-11-24) names these issuers; issuer home_domain is www.franklintempleton.com; cross-checked against rwa.xyz; XRPL issuance 064E2736...FFD8 from rwa.xyz, its on-chain metadata names Franklin Templeton Investments and the fund (the XRPL issuer account sets no domain)",
+    "issuer": "Franklin Templeton",
+    "tokens": [
+      {
+        "chain": "xrpl",
+        "class": "sgBENJI",
+        "kind": "xrpl_mpt",
+        "address": "064E27366D15D1F5614B4D4E3183F835BCD62E7F6FD9FFD8",
+        "rwa_address": "064e27366d15d1f5614b4d4e3183f835bcd62e7f6fd9ffd8",
+        "rpcs": [
+          "https://xrplcluster.com",
+          "https://s1.ripple.com:51234"
+        ]
+      },
+      {
+        "chain": "stellar",
+        "class": "sgBENJI",
+        "kind": "stellar",
+        "address": "sgBENJI-GAGICV3VBJSKKH5H5MQQIUTUP462YVHC23KUHZY6FJERRJFBDIVZBM5C",
+        "rpcs": [
+          "https://horizon.stellar.org",
+          "https://horizon.stellar.lobstr.co"
+        ]
+      }
+    ]
   }
 }

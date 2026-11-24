@@ -184,6 +184,25 @@ class XrplNearTest(unittest.TestCase):
         with mock.patch.object(check, "jsonrpc", lambda _u, m, _p: {"ledger_index": 1} if m == "gateway_balances" else {"account_data": {}}):
             self.assertEqual(check.read_xrpl("https://x.io", "USD-rIssuer")["supply"], Decimal(0))
 
+    def test_xrpl_mpt_scales_outstanding_and_names_from_metadata(self):
+        meta = '{"t": "sgBENJI", "in": "Franklin Templeton Investments"}'.encode().hex().upper()
+        seen = []
+
+        def rpc(_url, method, params):
+            seen.append((method, params[0]["ledger_index"]))
+            return {"ledger_index": 9, "node": {"OutstandingAmount": "1946177954184529", "AssetScale": 7, "MPTokenMetadata": meta}}
+        with mock.patch.object(check, "jsonrpc", rpc):
+            out = check.read_xrpl_mpt("https://x.io", "064E", height=9)
+        self.assertEqual(out["supply"], Decimal("194617795.4184529"))
+        self.assertEqual(out["name"], "sgBENJI (Franklin Templeton Investments)")
+        self.assertEqual(seen, [("ledger_entry", 9)])
+
+    def test_xrpl_mpt_without_metadata_fails_the_name_check(self):
+        with mock.patch.object(check, "jsonrpc", lambda *_: {"ledger_index": 1, "node": {"OutstandingAmount": "5"}}):
+            out = check.read_xrpl_mpt("https://x.io", "064E")
+        self.assertEqual((out["supply"], out["name"]), (Decimal(5), "? ()"))
+        self.assertIn("xrpl_mpt", check.HEADS)
+
     def test_near_scales_by_decimals_and_pins_the_block(self):
         refs = []
 

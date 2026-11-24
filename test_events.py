@@ -694,5 +694,14 @@ class MonthTest(unittest.TestCase):
         self.assertEqual(events.month_bounds("2026-12"), ("2026-12-01T00:00:00Z", "2027-01-01T00:00:00Z"))
 
 
+
+class ReadableTest(unittest.TestCase):
+    def test_second_stellar_class_can_opt_out_of_events(self):
+        self.assertTrue(events.readable({"kind": "stellar"}))
+        self.assertFalse(events.readable({"kind": "stellar", "events": False}))
+        self.assertTrue(events.readable({"kind": "evm", "events": {"span": 1}}))
+        self.assertFalse(events.readable({"kind": "xrpl_mpt"}))
+
+
 if __name__ == "__main__":
     unittest.main()

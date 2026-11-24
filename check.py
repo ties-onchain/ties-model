@@ -171,6 +171,19 @@ def read_xrpl(url, asset_id, height=None):
     return {"name": f"{code} ({domain})", "supply": supply, "at": f"validated ledger {ledger}"}
 
 
+def read_xrpl_mpt(url, issuance_id, height=None):
+    """Multi-purpose token on the XRP Ledger (XLS-33): OutstandingAmount of the issuance, scaled by AssetScale. Name from
+    the issuance metadata (XLS-89 JSON: t ticker, in issuer name)."""
+    res = jsonrpc(url, "ledger_entry", [{"mpt_issuance": issuance_id, "ledger_index": height if height is not None else "validated"}])
+    node = res["node"]
+    try:
+        meta = json.loads(bytes.fromhex(node.get("MPTokenMetadata", "")))
+    except ValueError:
+        meta = {}
+    supply = Decimal(int(node["OutstandingAmount"])).scaleb(-node.get("AssetScale", 0))
+    return {"name": f"{meta.get('t', '?')} ({meta.get('in', '')})", "supply": supply, "at": f"validated ledger {res['ledger_index']}"}
+
+
 def near_head(url):
     return int(jsonrpc(url, "block", {"finality": "final"})["header"]["height"])
 
@@ -187,7 +200,7 @@ def read_near(url, account, height=None):
     return {"name": meta["name"], "supply": supply, "at": f"final block {total['block_height']}"}
 
 
-READERS = {"xrpl": read_xrpl, "near": read_near, "evm": read_evm, "solana": read_solana, "aptos": read_aptos, "stellar": read_stellar, "starknet": read_starknet,
+READERS = {"xrpl": read_xrpl, "xrpl_mpt": read_xrpl_mpt, "near": read_near, "evm": read_evm, "solana": read_solana, "aptos": read_aptos, "stellar": read_stellar, "starknet": read_starknet,
            "soroban": lambda url, address: soroban.read_soroban(url, address, jsonrpc),
            "aptos-coin": read_aptos_coin, "sui": read_sui, "cosmos": read_cosmos}
 
@@ -195,7 +208,7 @@ READERS = {"xrpl": read_xrpl, "near": read_near, "evm": read_evm, "solana": read
 # Chains whose free endpoints answer for a past height: both providers are read at the lower of their two finalized heads,
 # so "the two agree" means the same block, not two blocks a few seconds apart. Solana, Stellar, Soroban, Sui and Cosmos
 # endpoints only serve the latest state; those keep each provider's own latest final read.
-HEADS = {"evm": evm_head, "aptos": aptos_head, "aptos-coin": aptos_head, "starknet": starknet_head, "xrpl": xrpl_head, "near": near_head}
+HEADS = {"evm": evm_head, "aptos": aptos_head, "aptos-coin": aptos_head, "starknet": starknet_head, "xrpl": xrpl_head, "xrpl_mpt": xrpl_head, "near": near_head}
 
 RETRY_WAITS = (3, 10, 30)  # seconds; public RPCs rate-limit (429) and blip; the 30 s try outlasts a per-minute limit (Tatum on Solana)
 
