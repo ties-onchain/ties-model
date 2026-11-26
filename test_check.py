@@ -1,3 +1,6 @@
+from pathlib import Path
+import tempfile
+import json
 import io
 import unittest
 from contextlib import redirect_stderr, redirect_stdout
@@ -160,6 +163,25 @@ class ReportTest(unittest.TestCase):
             with redirect_stderr(io.StringIO()) as err:
                 self.assertEqual(check.main("NOPE"), 2)
             self.assertIn("unknown fund NOPE", err.getvalue())
+
+    def test_fund_without_rwa_page_skips_rwa_xyz(self):
+        token = {"chain": "stellar", "class": "eBENJI", "address": "eBENJI-G1"}
+        row = {**token, "supply": Decimal("40"), "status": "ok"}
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(check, "HERE", Path(tmp)), \
+                mock.patch.object(check, "check_token", return_value=row), mock.patch.object(check.time, "sleep"), \
+                mock.patch.object(check, "rwa", mock.Mock(annotate=mock.Mock(side_effect=AssertionError("asked rwa.xyz")))), \
+                redirect_stdout(io.StringIO()) as out:  # whole module mocked: the public ties-model copy ships without rwa.py
+            self.assertTrue(check.run_fund("EBENJI", {"tokens": [token], "expect_name": ["x"], "rwa_slug": None}, "t"))
+            self.assertNotIn("rwa_updated", json.loads((Path(tmp) / "snapshots" / "EBENJI-t.json").read_text()))
+        self.assertIn("| **Total** | | **40.00** | |", out.getvalue())
+
+    def test_euro_fund_classes_are_franklin_stellar_and_one_carries_events(self):
+        cfg = json.loads((check.HERE / "funds.json").read_text())["EBENJI"]
+        issuers = {t["address"].split("-")[1] for t in cfg["tokens"]}
+        self.assertEqual(issuers, {"GAVR3ZZLHUZQ4LYHFTCDV22CANZNMSQPSZISQXCWADAZPKTHMEPS2BFC", "GDIMV4BQ5YJAG3L3ITUWZUSPCI44Q4KDMKFCKH4ZX652ZJU2DLH7KR74"})
+        self.assertEqual(cfg["expect_name"], ["franklintempleton.com"])
+        self.assertEqual([t.get("events", True) for t in cfg["tokens"]], [True, False])
+        self.assertIsNone(cfg["rwa_slug"])
 
 if __name__ == "__main__":
     unittest.main()

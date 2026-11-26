@@ -1,5 +1,5 @@
 {
- "taken": "2026-11-24T21:33Z",
+ "taken": "2026-11-26T21:32Z",
  "funds": {
   "BUIDL": {
    "checked": [
@@ -11,7 +11,7 @@
     {
      "chain": "solana",
      "holder": "8BJHEhSWJug1Tb6atcyLjZcCNcoX6Gfzo48CXAmU6ZSj",
-     "balance": "116081251.27",
+     "balance": "116093453.03",
      "name": "",
      "matches": [
       "aptos",
@@ -20,8 +20,22 @@
       "tempo"
      ],
      "exact": false,
-     "gap": "98477.360000",
+     "gap": "98810.010000",
      "why": "balance equals supply on aptos, arbitrum, optimism, tempo"
+    },
+    {
+     "chain": "solana",
+     "holder": "2sZuHDhNnfA8AKfwdmKsc1JxQtDEbHxffbQtvUyNhPYo",
+     "balance": "56415337.6611",
+     "name": "",
+     "matches": [
+      "arbitrum",
+      "optimism",
+      "tempo"
+     ],
+     "exact": false,
+     "gap": "47618.648900",
+     "why": "balance equals supply on arbitrum, optimism, tempo"
     }
    ],
    "chains": [
@@ -149,7 +163,7 @@
     {
      "chain": "ethereum",
      "holder": "0x0665FDe254598e307b63f3aAe3cCd881a62d4bE3",
-     "balance": "556283.786863",
+     "balance": "445000.000003",
      "name": "PoolEscrow",
      "matches": [],
      "exact": false,
@@ -187,6 +201,16 @@
    "chains": [
     "stellar",
     "xrpl"
+   ]
+  },
+  "EBENJI": {
+   "checked": [
+    "stellar"
+   ],
+   "skipped": [],
+   "flags": [],
+   "chains": [
+    "stellar"
    ]
   }
  }

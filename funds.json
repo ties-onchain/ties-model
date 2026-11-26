@@ -877,5 +877,40 @@
         ]
       }
     ]
+  },
+  "EBENJI": {
+    "label": "Franklin eBENJI",
+    "full_name": "Franklin OnChain Euro Liquidity Fund, Luxembourg share classes",
+    "note": "Euro LVNAV money market fund under Franklin's Luxembourg OnChain Funds umbrella, launched 23 Nov 2026. Two share classes on Stellar: eBENJI and erBENJI, identified from their issuers (home domain franklintempleton.com, the same signers as BENJI's issuer, created 19 Nov); Franklin's stellar.toml does not list them yet. Not on CoinGecko",
+    "expect_name": [
+      "franklintempleton.com"
+    ],
+    "rwa_slug": null,
+    "address_source": "Found 2026-11-25 on Stellar: both issuers set home_domain www.franklintempleton.com, were created 19 Nov 2026 by GBGJB2WE...L73X2 (the account that funded the grBENJI issuer), and carry the same 14 signers and 2/2/6 thresholds as the BENJI, gBENJI and grBENJI issuers. Each also issues EURPEND (the euro twin of the USDPEND asset on the USD fund issuers). Not yet in Franklin's stellar.toml (read 2026-11-25): recheck it",
+    "issuer": "Franklin Templeton",
+    "tokens": [
+      {
+        "chain": "stellar",
+        "class": "eBENJI",
+        "kind": "stellar",
+        "address": "eBENJI-GAVR3ZZLHUZQ4LYHFTCDV22CANZNMSQPSZISQXCWADAZPKTHMEPS2BFC",
+        "rpcs": [
+          "https://horizon.stellar.org",
+          "https://horizon.stellar.lobstr.co"
+        ]
+      },
+      {
+        "chain": "stellar",
+        "class": "erBENJI",
+        "kind": "stellar",
+        "slot": "stellar-erbenji",
+        "events": false,
+        "address": "erBENJI-GDIMV4BQ5YJAG3L3ITUWZUSPCI44Q4KDMKFCKH4ZX652ZJU2DLH7KR74",
+        "rpcs": [
+          "https://horizon.stellar.org",
+          "https://horizon.stellar.lobstr.co"
+        ]
+      }
+    ]
   }
 }

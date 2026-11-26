@@ -282,14 +282,14 @@ def run_fund(fund, cfg, taken):
         rows.append(check_token(token, cfg["expect_name"]))
         time.sleep(1)  # public RPCs rate-limit bursts
     extra = {}
-    if rwa:
+    if rwa and cfg.get("rwa_slug"):  # null = rwa.xyz has no page yet (an unknown slug serves another asset's page)
         rows, extra["rwa_updated"] = rwa.annotate(rows, cfg["rwa_slug"])
     if cfg.get("coingecko"):
         extra["coingecko"] = sources.coingecko(cfg["coingecko"])
     (HERE / "snapshots").mkdir(exist_ok=True)
     (HERE / "snapshots" / f"{fund}-{taken}.json").write_text(
         json.dumps({"fund": fund, "taken": taken, **extra, "rows": rows}, indent=1, default=str))
-    print(rwa.report(fund, rows, extra["rwa_updated"], taken) if rwa else report(fund, rows, taken), end="\n\n")
+    print(rwa.report(fund, rows, extra["rwa_updated"], taken) if "rwa_updated" in extra else report(fund, rows, taken), end="\n\n")
     return all(r["status"] == "ok" for r in rows)
 
 
